@@ -2,7 +2,7 @@
 
 ## 1. Estructura y Configuración Inicial
 - [x] Autoelevación de privilegios
-- [ ] Configuración inicial (rutas, directorios, codificación)
+- [x] Configuración inicial (rutas, directorios, codificación)
 - [ ] Definir rutas base para logs, backups e informes
 - [ ] Crear directorios necesarios si no existen
 - [ ] Establecer codificación UTF-8
