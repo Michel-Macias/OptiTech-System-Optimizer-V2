@@ -3,6 +3,7 @@
 import logging
 import logging.handlers
 import os
+import sys
 from src import config_manager
 
 APP_LOGGER_NAME = 'OptiTechOptimizer'
@@ -30,12 +31,12 @@ def setup_logging(log_file=None, console_level=logging.INFO, file_level=logging.
 
     # Define a common formatter for both console and file handlers
     formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S,%f'
+        '%(asctime)s,%(msecs)03d - %(levelname)s - %(name)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
     )
 
     # Console Handler
-    console_handler = logging.StreamHandler()
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(console_level)
     console_handler.setFormatter(formatter)
     app_logger.addHandler(console_handler)
@@ -53,6 +54,3 @@ def setup_logging(log_file=None, console_level=logging.INFO, file_level=logging.
 
     # Prevent messages from being propagated to the root logger
     app_logger.propagate = False
-
-# Initialize logging when the module is imported
-setup_logging()

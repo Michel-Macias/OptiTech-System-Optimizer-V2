@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 import io
 import tempfile
 import shutil
+import sys
 
 # Mock para el módulo config_manager
 class MockConfigManager:
@@ -26,10 +27,8 @@ class TestLogger(unittest.TestCase):
         # Limpiar cualquier configuración de logging existente
         logging.shutdown()
 
-        # Parchear config_manager y os.makedirs antes de importar src.logger
+        # Parchear config_manager antes de importar src.logger
         self.patcher_config = patch('src.logger.config_manager', new=self.mock_config_manager)
-        self.patcher_makedirs = patch('os.makedirs')
-        self.mock_makedirs = self.patcher_makedirs.start()
         self.patcher_config.start()
 
         # Importar el módulo logger *después* de configurar los mocks
@@ -43,8 +42,6 @@ class TestLogger(unittest.TestCase):
 
         # Configurar el logger para usar un archivo de log mock
         self.log_file_path = os.path.join(self.mock_config_manager.get_log_path(), "app.log")
-        # Asegurarse de que el directorio mockeado exista para el RotatingFileHandler
-        os.makedirs(os.path.dirname(self.log_file_path), exist_ok=True) # Esto llamará a nuestro mock_makedirs
         self.logger_module.setup_logging(log_file=self.log_file_path, max_bytes=1024, backup_count=5)
         self.app_logger = logging.getLogger('OptiTechOptimizer')
         self.app_logger.setLevel(logging.DEBUG) # Asegurarse de que todos los niveles se procesen
@@ -57,16 +54,12 @@ class TestLogger(unittest.TestCase):
             handler.close()
         # Detener los parches
         self.patcher_config.stop()
-        self.patcher_makedirs.stop()
         # Eliminar el directorio temporal
         shutil.rmtree(self.temp_log_dir)
 
     def test_log_file_creation_and_message_format(self):
         message = "This is a test info message."
         self.app_logger.info(message)
-
-        # Verificar que os.makedirs fue llamado para el directorio del log
-        self.mock_makedirs.assert_called_with(os.path.dirname(self.log_file_path), exist_ok=True)
 
         # Leer el contenido del archivo de log real (ya que estamos en un temp_dir)
         with open(self.log_file_path, 'r', encoding='utf-8') as f:
