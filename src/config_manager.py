@@ -6,7 +6,7 @@ APP_NAME = "OptiTechOptimizer"
 DEFAULT_ENCODING = "utf-8"
 
 def _get_base_app_data_path():
-    """Returns the base application data path (e.g., %LOCALAPPDATA%\OptiTechOptimizer)."""
+    r"""Returns the base application data path (e.g., %LOCALAPPDATA%\OptiTechOptimizer)."""
     local_app_data = os.path.expandvars('%LOCALAPPDATA%')
     return os.path.join(local_app_data, APP_NAME)
 
