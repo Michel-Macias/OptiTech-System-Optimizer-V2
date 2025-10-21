@@ -45,7 +45,7 @@ class MockOs:
 
 class TestLogger(unittest.TestCase):
 
-    @patch('src.config_manager', new=MockConfigManager())
+    @patch('src.logger.config_manager', new=MockConfigManager())
     @patch('os.makedirs', new=MockOs().makedirs)
     @patch('os.path.exists', new=MockOs().path_exists)
     @patch('os.path.getsize', new=MockOs().path_getsize)
