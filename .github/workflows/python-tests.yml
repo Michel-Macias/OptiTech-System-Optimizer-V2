@@ -1,4 +1,4 @@
-name: Python Tests (Windows)
+name: CI - Python tests
 
 on:
   push:
@@ -7,33 +7,38 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test-windows:
-    runs-on: windows-latest
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python-version: [3.10, 3.11]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      shell: pwsh
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install xmlrunner
+        shell: powershell
 
-    - name: Run unit tests
-      shell: pwsh
-      run: |
-        python -m unittest discover -v
+      - name: Run unit tests (generate JUnit XML)
+        run: |
+          mkdir -Force test-results
+          python -m xmlrunner discover -v -o test-results
+        shell: powershell
 
-    - name: Upload test results (JUnit)
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: unittest-output
-        path: |
-          ./**/test-results.xml
+      - name: Upload test results (JUnit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unittest-output
+          path: test-results
