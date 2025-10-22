@@ -1,0 +1,186 @@
+# src/system_analysis.py
+
+import platform
+import psutil
+import logging
+import datetime
+import os
+from src import config_manager
+
+APP_LOGGER_NAME = 'OptiTechOptimizer'
+logger = logging.getLogger(APP_LOGGER_NAME)
+
+def get_system_specs():
+    """Recopila especificaciones detalladas de hardware y sistema operativo."""
+    logger.info("Recopilando especificaciones del sistema...")
+    try:
+        # --- Información del Sistema Operativo ---
+        os_info = {
+            "system": platform.system(),
+            "release": platform.release(),
+            "version": platform.version(),
+            "architecture": platform.machine(),
+            "hostname": platform.node(),
+        }
+
+        # --- Información de la CPU ---
+        cpu_info = {
+            "physical_cores": psutil.cpu_count(logical=False),
+            "total_cores": psutil.cpu_count(logical=True),
+            "max_frequency": f"{psutil.cpu_freq().max:.2f} Mhz",
+            "min_frequency": f"{psutil.cpu_freq().min:.2f} Mhz",
+            "current_frequency": f"{psutil.cpu_freq().current:.2f} Mhz",
+            "usage_per_core": [f"{usage}%" for usage in psutil.cpu_percent(percpu=True, interval=1)],
+            "total_usage": f"{psutil.cpu_percent(interval=1)}%",
+        }
+
+        # --- Información de la Memoria ---
+        svmem = psutil.virtual_memory()
+        memory_info = {
+            "total": f"{svmem.total / (1024**3):.2f} GB",
+            "available": f"{svmem.available / (1024**3):.2f} GB",
+            "used": f"{svmem.used / (1024**3):.2f} GB",
+            "percentage": f"{svmem.percent}%",
+        }
+
+        # --- Información de Discos ---
+        partitions = psutil.disk_partitions()
+        disk_info = []
+        for partition in partitions:
+            try:
+                partition_usage = psutil.disk_usage(partition.mountpoint)
+                disk_info.append({
+                    "device": partition.device,
+                    "mountpoint": partition.mountpoint,
+                    "fstype": partition.fstype,
+                    "total_size": f"{partition_usage.total / (1024**3):.2f} GB",
+                    "used": f"{partition_usage.used / (1024**3):.2f} GB",
+                    "free": f"{partition_usage.free / (1024**3):.2f} GB",
+                    "percentage": f"{partition_usage.percent}%",
+                })
+            except PermissionError:
+                logger.warning(f"No se pudo acceder a la partición de disco {partition.mountpoint} debido a un PermissionError.")
+                continue
+
+        specs = {
+            "os_info": os_info,
+            "cpu_info": cpu_info,
+            "memory_info": memory_info,
+            "disk_info": disk_info,
+        }
+        
+        logger.info("Especificaciones del sistema recopiladas con éxito.")
+        return specs
+
+    except Exception as e:
+        logger.error(f"Ocurrió un error al recopilar las especificaciones del sistema: {e}", exc_info=True)
+        return None
+
+def get_service_status():
+    """Cuenta los servicios del sistema por su estado (en ejecución, detenido, etc.)."""
+    logger.info("Recopilando información del estado de los servicios...")
+    status_counts = {
+        'total': 0,
+        'running': 0,
+        'stopped': 0,
+        'paused': 0,
+        'other': 0
+    }
+    try:
+        for service in psutil.win_service_iter():
+            status = service.status()
+            status_counts['total'] += 1
+            if status in status_counts:
+                status_counts[status] += 1
+            else:
+                status_counts['other'] += 1
+        logger.info("Estado de los servicios recopilado con éxito.")
+        return status_counts
+    except Exception as e:
+        logger.error(f"Ocurrió un error al recopilar el estado de los servicios: {e}", exc_info=True)
+        return None
+
+def run_system_analysis():
+    """Ejecuta un análisis completo del sistema y guarda el informe en un archivo."""
+    logger.info("Iniciando análisis completo del sistema...")
+
+    specs = get_system_specs()
+    services = get_service_status()
+
+    if not specs or not services:
+        logger.error("El análisis del sistema falló porque una o más funciones de recopilación de datos fallaron.")
+        return
+
+    # --- Construir Cadena del Informe ---
+    report = """
+    ========================================
+    Informe de Análisis de OptiTech System Optimizer
+    ========================================
+
+    Informe generado el: {report_date}
+
+    ---[ 1. Información del Sistema Operativo ]---
+    Sistema:    {os_system} {os_release}
+    Versión:    {os_version}
+    Hostname:   {os_hostname}
+    Arqui:      {os_arch}
+
+    ---[ 2. Información de la CPU ]---
+    Núcleos:    {cpu_physical_cores} Físicos, {cpu_total_cores} Lógicos
+    Frecuencia: {cpu_current_freq} (Min: {cpu_min_freq}, Max: {cpu_max_freq})
+    Carga Total: {cpu_total_usage}
+
+    ---[ 3. Información de la Memoria (RAM) ]---
+    Total:      {mem_total}
+    Disponible: {mem_available}
+    En uso:     {mem_used} ({mem_percentage})
+
+    ---[ 4. Estado de los Servicios ]---
+    Servicios Totales: {srv_total}
+    En ejecución:      {srv_running}
+    Detenidos:         {srv_stopped}
+    Pausados:          {srv_paused}
+
+    ---[ 5. Información de Discos ]---
+    {disk_report}
+    """.format(
+        report_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        os_system=specs['os_info']['system'],
+        os_release=specs['os_info']['release'],
+        os_version=specs['os_info']['version'],
+        os_hostname=specs['os_info']['hostname'],
+        os_arch=specs['os_info']['architecture'],
+        cpu_physical_cores=specs['cpu_info']['physical_cores'],
+        cpu_total_cores=specs['cpu_info']['total_cores'],
+        cpu_current_freq=specs['cpu_info']['current_frequency'],
+        cpu_min_freq=specs['cpu_info']['min_frequency'],
+        cpu_max_freq=specs['cpu_info']['max_frequency'],
+        cpu_total_usage=specs['cpu_info']['total_usage'],
+        mem_total=specs['memory_info']['total'],
+        mem_available=specs['memory_info']['available'],
+        mem_used=specs['memory_info']['used'],
+        mem_percentage=specs['memory_info']['percentage'],
+        srv_total=services['total'],
+        srv_running=services['running'],
+        srv_stopped=services['stopped'],
+        srv_paused=services['paused'],
+        disk_report="\n".join([
+            f"    Dispositivo: {d['device']} | Montaje: {d['mountpoint']} | Tipo: {d['fstype']}\n" \
+            f"    Tamaño: {d['total_size']} | Usado: {d['used']} ({d['percentage']})"
+            for d in specs['disk_info']
+        ])
+    )
+
+    # --- Guardar Archivo de Informe ---
+    try:
+        report_dir = config_manager.get_report_path()
+        file_name = f"Informe_Analisis_Sistema_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        file_path = os.path.join(report_dir, file_name)
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(report)
+        
+        logger.info(f"Informe de análisis del sistema guardado en {file_path}")
+    except Exception as e:
+        logger.error(f"Fallo al guardar el informe de análisis: {e}", exc_info=True)
+

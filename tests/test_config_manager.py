@@ -3,6 +3,7 @@
 import unittest
 import os
 from unittest.mock import patch, MagicMock
+import importlib
 
 # Mock para simular la función os.makedirs
 class MockOs:
@@ -23,14 +24,10 @@ class TestConfigManager(unittest.TestCase):
         mock_exists.return_value = False # Simular que los directorios no existen inicialmente
         mock_makedirs.side_effect = MockOs().makedirs # Usar nuestro mock para makedirs
 
-        # Importar el módulo de configuración *después* de configurar los mocks
-        # para asegurar que el módulo usa los mocks al inicializarse
-        # Esto fallará porque src.config_manager no existe aún, lo cual es el comportamiento esperado de un test que falla.
-        try:
-            from src import config_manager
-            self.config_manager = config_manager
-        except ImportError:
-            self.config_manager = None # Para que las pruebas puedan fallar limpiamente si el módulo no existe
+        # Importar y forzar la recarga del módulo para que use los mocks
+        from src import config_manager
+        importlib.reload(config_manager)
+        self.config_manager = config_manager
 
     def test_default_app_data_path(self):
         self.assertIsNotNone(self.config_manager, "config_manager module not found")
