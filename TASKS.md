@@ -20,12 +20,12 @@
 - [x] Implementar Run-SystemAnalysis (Ejecuta un diagnóstico completo y genera un informe)
 
 ## 4. Limpieza del Sistema
-- [ ] Definir niveles de limpieza (Básico, Extendido, Avanzado)
-- [ ] Implementar Clear-TempFiles (Limpieza según nivel)
-- [ ] Implementar Clear-RecycleBinSafe
-- [ ] Implementar Clear-WinSxS
-- [ ] Implementar Clear-ShadowCopies
-- [ ] Implementar Run-Cleaner (Menú interactivo para elegir nivel o modo informe)
+- [x] Definir niveles de limpieza (Básico, Extendido, Avanzado)
+- [x] Implementar Clear-TempFiles (Limpieza según nivel)
+- [x] Implementar Clear-RecycleBinSafe
+- [x] Implementar Clear-WinSxS
+- [x] Implementar Clear-ShadowCopies
+- [x] Implementar Run-Cleaner (Menú interactivo para elegir nivel o modo informe)
 
 ## 5. Optimización del Sistema
 - [ ] Implementar Optimize-Services (Desactiva servicios no críticos)

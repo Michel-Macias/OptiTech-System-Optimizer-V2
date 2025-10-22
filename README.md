@@ -11,7 +11,7 @@ Este proyecto se desarrolla utilizando **Python** con una arquitectura modular, 
 *   [x] **Módulo 1: Estructura y Configuración Inicial**: Configuración de la estructura del proyecto, sistema de logging, gestión de configuración y auto-elevación de privilegios (UAC).
 *   [x] **Módulo 2: Funciones de Utilidad**: Implementación de helpers para la interfaz de usuario como encabezados, barras de progreso y confirmaciones.
 *   [x] **Módulo 3: Análisis del Sistema**: Implementación de la capacidad de recopilar y guardar informes detallados sobre el SO, hardware, servicios y uso de recursos.
-*   [ ] **Módulo 4: Limpieza del Sistema**: En desarrollo.
+*   [x] **Módulo 4: Limpieza del Sistema**: Implementación de funciones para limpiar archivos temporales, vaciar la papelera de reciclaje, limpiar WinSxS y eliminar copias de sombra.
 *   [ ] **Módulo 5: Optimización del Sistema**
 *   [ ] **Módulo 6: Mantenimiento y Backups**
 *   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
@@ -38,7 +38,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El desarrollo actual se centra en el **Módulo 4: Limpieza del Sistema**. Se están implementando las funciones para eliminar archivos innecesarios de forma segura, con diferentes niveles de limpieza.
+El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. Se están planificando e implementando las funciones para ajustar servicios, efectos visuales, planes de energía y configuración de red.
 
 ## Cómo Contribuir
 
