@@ -8,6 +8,7 @@ from src import logger
 from src import config_manager
 from src import system_cleaner
 from src import system_analysis
+from src import system_optimizer
 from src import utils
 
 APP_LOGGER_NAME = 'OptiTechOptimizer'
@@ -52,6 +53,7 @@ def main():
         print("\nSeleccione una opción:")
         print("  1. Ejecutar Análisis del Sistema")
         print("  2. Ejecutar Limpiador del Sistema")
+        print("  3. Ejecutar Optimizador del Sistema")
         print("  0. Salir")
 
         opcion = input("Ingrese su opción: ").strip()
@@ -60,6 +62,8 @@ def main():
             system_analysis.run_system_analysis()
         elif opcion == '2':
             system_cleaner.ejecutar_limpiador()
+        elif opcion == '3':
+            system_optimizer.run_optimizer()
         elif opcion == '0':
             app_logger.info("Aplicación finalizada.")
             break
