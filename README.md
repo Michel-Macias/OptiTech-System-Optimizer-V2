@@ -38,7 +38,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. Se están planificando e implementando las funciones para ajustar servicios, efectos visuales, planes de energía y configuración de red.
+El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la funcionalidad para **optimizar los efectos visuales**.
 
 ## Cómo Contribuir
 
