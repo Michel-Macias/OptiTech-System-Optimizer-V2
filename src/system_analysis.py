@@ -110,9 +110,50 @@ def run_system_analysis():
     if not specs or not services:
         logger.error("El análisis del sistema falló porque una o más funciones de recopilación de datos fallaron.")
         return
+    # --- Construir Informe en Markdown (más legible) ---
+    report_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # --- Construir Cadena del Informe ---
-    report = """
+    md_sections = []
+    md_sections.append(f"# Informe de Análisis de OptiTech System Optimizer\n")
+    md_sections.append(f"**Informe generado el:** {report_date}\n")
+
+    # Sistema
+    md_sections.append("## 1. Información del Sistema Operativo\n")
+    md_sections.append(f"- **Sistema:** {specs['os_info']['system']} {specs['os_info']['release']}\n")
+    md_sections.append(f"- **Versión:** {specs['os_info']['version']}\n")
+    md_sections.append(f"- **Hostname:** {specs['os_info']['hostname']}\n")
+    md_sections.append(f"- **Arquitectura:** {specs['os_info']['architecture']}\n")
+
+    # CPU
+    md_sections.append("## 2. Información de la CPU\n")
+    md_sections.append(f"- **Núcleos:** {specs['cpu_info']['physical_cores']} físicos, {specs['cpu_info']['total_cores']} lógicos\n")
+    md_sections.append(f"- **Frecuencia:** {specs['cpu_info']['current_frequency']} (Min: {specs['cpu_info']['min_frequency']}, Max: {specs['cpu_info']['max_frequency']})\n")
+    md_sections.append(f"- **Carga Total:** {specs['cpu_info']['total_usage']}\n")
+
+    # Memoria
+    md_sections.append("## 3. Información de la Memoria (RAM)\n")
+    md_sections.append(f"- **Total:** {specs['memory_info']['total']}\n")
+    md_sections.append(f"- **Disponible:** {specs['memory_info']['available']}\n")
+    md_sections.append(f"- **En uso:** {specs['memory_info']['used']} ({specs['memory_info']['percentage']})\n")
+
+    # Servicios
+    md_sections.append("## 4. Estado de los Servicios\n")
+    md_sections.append(f"- **Servicios Totales:** {services['total']}\n")
+    md_sections.append(f"- **En ejecución:** {services['running']}\n")
+    md_sections.append(f"- **Detenidos:** {services['stopped']}\n")
+    md_sections.append(f"- **Pausados:** {services['paused']}\n")
+
+    # Discos
+    md_sections.append("## 5. Información de Discos\n")
+    disk_lines = []
+    for d in specs['disk_info']:
+        disk_lines.append(f"- **Dispositivo:** {d['device']} | Montaje: {d['mountpoint']} | Tipo: {d['fstype']}\n  - Tamaño: {d['total_size']} | Usado: {d['used']} ({d['percentage']})")
+    md_sections.append("\n".join(disk_lines) + "\n")
+
+    md_report = "\n".join(md_sections)
+
+    # --- Additionally include a legacy plain-text section for backwards compatibility/tests ---
+    plain_report = """
     ========================================
     Informe de Análisis de OptiTech System Optimizer
     ========================================
@@ -144,7 +185,7 @@ def run_system_analysis():
     ---[ 5. Información de Discos ]---
     {disk_report}
     """.format(
-        report_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        report_date=report_date,
         os_system=specs['os_info']['system'],
         os_release=specs['os_info']['release'],
         os_version=specs['os_info']['version'],
@@ -171,16 +212,37 @@ def run_system_analysis():
         ])
     )
 
-    # --- Guardar Archivo de Informe ---
+    # Combine markdown and legacy plain text so tests and users both get a readable file
+    final_report = md_report + "\n\n" + plain_report
+
+    # --- Guardar Archivo de Informe (Markdown) ---
     try:
         report_dir = config_manager.get_report_path()
-        file_name = f"Informe_Analisis_Sistema_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        file_name = f"Informe_Analisis_Sistema_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         file_path = os.path.join(report_dir, file_name)
         
         with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(report)
-        
+                f.write(final_report)
+
         logger.info(f"Informe de análisis del sistema guardado en {file_path}")
+
+        # Mostrar un resumen formateado en la consola para el usuario (más legible)
+        try:
+            from src import utils as _utils
+            _utils.show_header("Resumen del Análisis del Sistema")
+            print(f"Sistema: {specs['os_info']['system']} {specs['os_info']['release']} ({specs['os_info']['architecture']})")
+            print(f"Hostname: {specs['os_info']['hostname']}")
+            print(f"CPU: {specs['cpu_info']['total_usage']} | Núcleos: {specs['cpu_info']['physical_cores']}/{specs['cpu_info']['total_cores']}")
+            print(f"RAM: {specs['memory_info']['used']} / {specs['memory_info']['total']} ({specs['memory_info']['percentage']})")
+            print(f"Servicios: {services['running']} running / {services['total']} total")
+            print('\nDiscos:')
+            for d in specs['disk_info']:
+                print(f" - {d['mountpoint']}: {d['used']} / {d['total_size']} ({d['percentage']})")
+            print(f"\nInforme guardado en: {file_path}")
+        except Exception:
+            # Si por alguna razón la impresión fallase, no detener el flujo
+            pass
+
     except Exception as e:
         logger.error(f"Fallo al guardar el informe de análisis: {e}", exc_info=True)
 
