@@ -27,13 +27,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install xmlrunner
         shell: powershell
 
-      - name: Run unit tests (generate JUnit XML)
+      - name: Run unit tests (capture output)
         run: |
           mkdir -Force test-results
-          python -m xmlrunner discover -v -o test-results
+          # Ejecuta los tests y guarda la salida en un archivo dentro de test-results
+          python -m unittest discover -v | Tee-Object -FilePath test-results\unittest.txt
         shell: powershell
 
       - name: Upload test results (JUnit)
