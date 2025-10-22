@@ -8,16 +8,16 @@
 - [ ] Establecer codificación UTF-8
 
 ## 2. Funciones de Utilidad
-- [ ] Implementar Write-Log (Registro de eventos con niveles INFO, WARN y ERROR)
-- [ ] Implementar Show-Header
-- [ ] Implementar Show-ProgressBar
-- [ ] Implementar Confirm-Operation
+- [x] Implementar Write-Log (Registro de eventos con niveles INFO, WARN y ERROR)
+- [x] Implementar Show-Header
+- [x] Implementar Show-ProgressBar
+- [x] Implementar Confirm-Operation
 
 ## 3. Análisis del Sistema
-- [ ] Implementar Get-SystemSpecs (Recoge información de hardware y sistema operativo)
-- [ ] Implementar Get-PerformanceData (Mide uso de CPU y espacio libre en disco)
-- [ ] Implementar Get-ServiceStatus (Cuenta servicios activos)
-- [ ] Implementar Run-SystemAnalysis (Ejecuta un diagnóstico completo y genera un informe)
+- [x] Implementar Get-SystemSpecs (Recoge información de hardware y sistema operativo)
+- [x] Implementar Get-PerformanceData (Mide uso de CPU y espacio libre en disco)
+- [x] Implementar Get-ServiceStatus (Cuenta servicios activos)
+- [x] Implementar Run-SystemAnalysis (Ejecuta un diagnóstico completo y genera un informe)
 
 ## 4. Limpieza del Sistema
 - [ ] Definir niveles de limpieza (Básico, Extendido, Avanzado)

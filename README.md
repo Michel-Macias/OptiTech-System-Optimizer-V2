@@ -6,6 +6,16 @@
 
 Este proyecto se desarrolla utilizando **Python** con una arquitectura modular, y se distribuirá como un ejecutable autónomo (`.exe`) para facilitar su uso y distribución interna.
 
+## Progreso del Proyecto
+
+*   [x] **Módulo 1: Estructura y Configuración Inicial**: Configuración de la estructura del proyecto, sistema de logging, gestión de configuración y auto-elevación de privilegios (UAC).
+*   [x] **Módulo 2: Funciones de Utilidad**: Implementación de helpers para la interfaz de usuario como encabezados, barras de progreso y confirmaciones.
+*   [x] **Módulo 3: Análisis del Sistema**: Implementación de la capacidad de recopilar y guardar informes detallados sobre el SO, hardware, servicios y uso de recursos.
+*   [ ] **Módulo 4: Limpieza del Sistema**: En desarrollo.
+*   [ ] **Módulo 5: Optimización del Sistema**
+*   [ ] **Módulo 6: Mantenimiento y Backups**
+*   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
+
 ## Funcionalidades Clave
 
 La herramienta incluirá las siguientes funcionalidades principales:
@@ -22,14 +32,13 @@ La herramienta incluirá las siguientes funcionalidades principales:
 *   **Lenguaje de Programación**: Python
 *   **Sistema Operativo Objetivo**: Exclusivamente Windows 11.
 *   **Arquitectura**: Modular, facilitando el mantenimiento y la escalabilidad.
-
 *   **Distribución**: Ejecutable autónomo (`.exe`) generado con `PyInstaller`.
 *   **Seguridad**: Implementación robusta de elevación de privilegios (UAC), validación de entradas, confirmaciones explícitas para operaciones críticas y logging detallado.
 *   **Rendimiento**: Optimización del código Python y, cuando sea necesario, invocación de comandos nativos de Windows o PowerShell para tareas de bajo nivel.
 
-## Primeros Pasos (Desarrollo)
+## Estado Actual del Desarrollo
 
-La primera funcionalidad en la que estamos trabajando es la **Autoelevación de Privilegios (UAC)** para asegurar que la herramienta pueda realizar las operaciones necesarias en el sistema.
+El desarrollo actual se centra en el **Módulo 4: Limpieza del Sistema**. Se están implementando las funciones para eliminar archivos innecesarios de forma segura, con diferentes niveles de limpieza.
 
 ## Cómo Contribuir
 
