@@ -3,9 +3,9 @@
 ## 1. Estructura y Configuración Inicial
 - [x] Autoelevación de privilegios
 - [x] Configuración inicial (rutas, directorios, codificación)
-- [ ] Definir rutas base para logs, backups e informes
-- [ ] Crear directorios necesarios si no existen
-- [ ] Establecer codificación UTF-8
+- [x] Definir rutas base para logs, backups e informes
+- [x] Crear directorios necesarios si no existen
+- [x] Establecer codificación UTF-8
 
 ## 2. Funciones de Utilidad
 - [x] Implementar Write-Log (Registro de eventos con niveles INFO, WARN y ERROR)
