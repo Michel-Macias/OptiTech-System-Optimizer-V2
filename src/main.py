@@ -18,6 +18,21 @@ def main():
     parser.add_argument('--no-elevate', action='store_true', help='No intentar elevar privilegios (útil para pruebas).')
     args, _ = parser.parse_known_args()
 
+    # Force UTF-8 output in Python (helps avoid mojibake in Windows consoles)
+    try:
+        import os
+        os.environ.setdefault('PYTHONUTF8', '1')
+        # Reconfigure stdout/stderr to utf-8 if supported (Python 3.7+)
+        import sys
+        try:
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            # Not all environments support reconfigure; ignore if unavailable
+            pass
+    except Exception:
+        pass
+
     # 1. Asegurar privilegios de administrador (saltear si --no-elevate)
     if not args.no_elevate:
         # Use module invocation to ensure the elevated process runs the module the same way
