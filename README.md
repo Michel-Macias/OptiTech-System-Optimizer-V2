@@ -44,6 +44,39 @@ El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. S
 
 (Se añadirán instrucciones detalladas sobre cómo contribuir al proyecto en el futuro.)
 
+## Testing rápido
+
+Pasos rápidos para preparar el entorno y ejecutar las pruebas en Windows (PowerShell):
+
+- Crear y activar un virtualenv:
+
+```powershell
+python -m venv .venv
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+.\.venv\Scripts\Activate.ps1
+```
+
+- Instalar dependencias:
+
+```powershell
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+- Ejecutar tests unitarios:
+
+```powershell
+python -m unittest discover -v
+```
+
+- Ejecutar la aplicación (modo desarrollo, sin elevar UAC):
+
+```powershell
+python -m src.main --no-elevate
+```
+
+Logs e informes se escriben en `%LOCALAPPDATA%\\OptiTechOptimizer`.
+
 ## Licencia
 
 (Se especificará la licencia del proyecto.)
