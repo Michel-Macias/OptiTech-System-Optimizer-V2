@@ -28,7 +28,7 @@
 - [x] Implementar Run-Cleaner (Menú interactivo para elegir nivel o modo informe)
 
 ## 5. Optimización del Sistema
-- [ ] Implementar Optimize-VisualEffects (Ajusta efectos visuales)
+- [x] Implementar Optimize-VisualEffects (Ajusta efectos visuales)
 - [ ] Implementar Optimize-Services (Desactiva servicios no críticos)
 - [ ] Implementar Optimize-PowerPlan (Activa plan de energía de alto rendimiento)
 - [ ] Implementar Optimize-Network (Reinicia configuración de red)
