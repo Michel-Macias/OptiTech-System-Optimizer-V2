@@ -18,6 +18,7 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
 *   [x] **Módulo 4: Limpieza del Sistema**: Implementación de funciones para limpiar archivos temporales, vaciar la papelera de reciclaje, limpiar WinSxS y eliminar copias de sombra.
 *   [ ] **Módulo 5: Optimización del Sistema**
     *   [x] Optimización de Efectos Visuales
+    *   [x] Optimización de Servicios
 *   [ ] **Módulo 6: Mantenimiento y Backups**
 *   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
 
@@ -43,7 +44,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la funcionalidad para **optimizar los servicios no críticos (Optimize-Services)**.
+El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la funcionalidad para **activar el plan de energía de alto rendimiento (Optimize-PowerPlan)**.
 
 ## Cómo Contribuir
 
