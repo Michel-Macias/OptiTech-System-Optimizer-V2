@@ -1,19 +1,12 @@
 {
   "services": [
     {
-      "name": "SysMain",
-      "description": "Conocido como Superfetch. Precarga aplicaciones usadas frecuentemente. Desactivarlo puede mejorar el rendimiento en SSDs y liberar RAM, pero podría ralentizar el inicio de programas.",
-      "level": "safe"
+      "name": "DiagTrack",
+      "description": "Connected User Experiences and Telemetry. Disabling can improve privacy."
     },
     {
-      "name": "Print Spooler",
-      "description": "Servicio de impresión. Si no se utiliza una impresora (física o virtual como PDF), se puede desactivar para ahorrar recursos.",
-      "level": "safe_if_no_printer"
-    },
-    {
-      "name": "Fax",
-      "description": "Servicio para enviar y recibir faxes. La mayoría de los usuarios no lo necesitan.",
-      "level": "very_safe"
+      "name": "dmwappushservice",
+      "description": "Device Management Wireless Application Protocol (WAP) Push message Routing Service. Often not required."
     }
   ]
 }
