@@ -3,7 +3,7 @@
 import unittest
 import os
 import json
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, call
 from src import system_optimizer
 
 class TestSystemOptimizer(unittest.TestCase):
@@ -110,6 +110,60 @@ class TestSystemOptimizer(unittest.TestCase):
         mock_get_status.assert_called_once_with('TestService')
         mock_confirm.assert_called_once()
         mock_set_service.assert_called_once_with('TestService', 'disabled')
+
+    @patch('src.utils.set_registry_value')
+    @patch('src.config_manager.load_config')
+    def test_optimize_visual_effects(self, mock_load_config, mock_set_registry_value):
+        """
+        Prueba que la función de optimización de efectos visuales carga la configuración
+        y llama a las funciones de modificación del registro correctamente.
+        """
+        # Arrange: Configuración simulada que devolverá el config_manager
+        mock_settings = [
+            {
+                "description": "Disable menu animations",
+                "hive": "HKEY_CURRENT_USER",
+                "key": "Control Panel\\Desktop",
+                "value_name": "MenuShowDelay",
+                "optimized_value": "0",
+                "value_type": "REG_SZ"
+            },
+            {
+                "description": "Disable window animations",
+                "hive": "HKEY_CURRENT_USER",
+                "key": "Software\\Microsoft\\Windows\\DWM",
+                "value_name": "EnableAnimations",
+                "optimized_value": 0,
+                "value_type": "REG_DWORD"
+            }
+        ]
+        mock_load_config.return_value = mock_settings
+        mock_set_registry_value.return_value = (True, "") # Simula éxito
+
+        # Act: Llama a la función que estamos probando (aún no existe)
+        system_optimizer.optimize_visual_effects()
+
+        # Assert: Verifica que todo fue llamado como se esperaba
+        mock_load_config.assert_called_once_with("visual_effects_settings.json")
+
+        expected_calls = [
+            unittest.mock.call(
+                hive="HKEY_CURRENT_USER",
+                key="Control Panel\\Desktop",
+                value_name="MenuShowDelay",
+                value="0",
+                value_type="REG_SZ"
+            ),
+            unittest.mock.call(
+                hive="HKEY_CURRENT_USER",
+                key="Software\\Microsoft\\Windows\\DWM",
+                value_name="EnableAnimations",
+                value=0,
+                value_type="REG_DWORD"
+            )
+        ]
+        mock_set_registry_value.assert_has_calls(expected_calls, any_order=True)
+
 
 if __name__ == '__main__':
     unittest.main()

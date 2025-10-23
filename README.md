@@ -6,6 +6,10 @@
 
 Este proyecto se desarrolla utilizando **Python** con una arquitectura modular, y se distribuirá como un ejecutable autónomo (`.exe`) para facilitar su uso y distribución interna.
 
+## Guía de Usuario
+
+Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra **[Guía de Usuario](GUIA_USUARIO.md)**.
+
 ## Progreso del Proyecto
 
 *   [x] **Módulo 1: Estructura y Configuración Inicial**: Configuración de la estructura del proyecto, sistema de logging, gestión de configuración y auto-elevación de privilegios (UAC).
@@ -13,6 +17,7 @@ Este proyecto se desarrolla utilizando **Python** con una arquitectura modular, 
 *   [x] **Módulo 3: Análisis del Sistema**: Implementación de la capacidad de recopilar y guardar informes detallados sobre el SO, hardware, servicios y uso de recursos.
 *   [x] **Módulo 4: Limpieza del Sistema**: Implementación de funciones para limpiar archivos temporales, vaciar la papelera de reciclaje, limpiar WinSxS y eliminar copias de sombra.
 *   [ ] **Módulo 5: Optimización del Sistema**
+    *   [x] Optimización de Efectos Visuales
 *   [ ] **Módulo 6: Mantenimiento y Backups**
 *   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
 
@@ -38,7 +43,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la funcionalidad para **optimizar los efectos visuales**.
+El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la funcionalidad para **optimizar los servicios no críticos (Optimize-Services)**.
 
 ## Cómo Contribuir
 

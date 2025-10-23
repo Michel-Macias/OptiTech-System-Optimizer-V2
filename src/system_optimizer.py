@@ -149,3 +149,38 @@ def run_optimizer():
     print(f"\nOptimización completada. Se aplicaron {optimizations_applied} cambios.")
     logger.info(f"Módulo de optimización finalizado. Cambios aplicados: {optimizations_applied}")
 
+def optimize_visual_effects():
+    """Orquesta la optimización de los efectos visuales de Windows."""
+    utils.show_header("Módulo de Optimización de Efectos Visuales")
+    logger.info("Iniciando la optimización de efectos visuales.")
+
+    settings = config_manager.load_config('visual_effects_settings.json')
+
+    if not settings:
+        print("No se encontraron configuraciones para la optimización de efectos visuales.")
+        logger.warning("El archivo 'visual_effects_settings.json' no se encontró o está vacío.")
+        return
+
+    changes_applied = 0
+    for i, setting in enumerate(settings, 1):
+        description = setting.get('description', 'Sin descripción')
+        print(f"\n--- {i}. Aplicando: {description} ---")
+        
+        success, message = utils.set_registry_value(
+            hive=setting['hive'],
+            key=setting['key'],
+            value_name=setting['value_name'],
+            value=setting['optimized_value'],
+            value_type=setting['value_type']
+        )
+
+        if success:
+            print(f"Éxito: Configuración '{description}' aplicada.")
+            changes_applied += 1
+        else:
+            print(f"Error al aplicar '{description}': {message}")
+            logger.error(f"Fallo al establecer el valor del registro para '{description}': {message}")
+
+    print(f"\nOptimización de efectos visuales completada. Se aplicaron {changes_applied} cambios.")
+    logger.info(f"Finalizada la optimización de efectos visuales. Cambios aplicados: {changes_applied}")
+
