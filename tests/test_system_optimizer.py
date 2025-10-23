@@ -200,6 +200,27 @@ class TestSystemOptimizer(unittest.TestCase):
         ]
         mock_set_service.assert_has_calls(set_service_calls, any_order=True)
 
+    @patch('subprocess.run')
+    @patch('src.system_optimizer.config_manager.load_config')
+    def test_optimize_power_plan(self, mock_load_config, mock_run):
+        """
+        Prueba que la función para optimizar el plan de energía carga la configuración
+        y llama al comando powercfg correctamente.
+        """
+        # Arrange: Configuración simulada y mock de subprocess.run
+        mock_config = {"high_performance_guid": "TEST-GUID-HIGH-PERFORMANCE"}
+        mock_load_config.return_value = mock_config
+        mock_run.return_value = unittest.mock.Mock(returncode=0) # Simula éxito
+
+        # Act: Llama a la función que estamos probando
+        system_optimizer.optimize_power_plan()
+
+        # Assert: Verifica las llamadas a los mocks
+        mock_load_config.assert_called_once_with("power_plan_settings.json")
+        mock_run.assert_called_once_with(
+            ["powercfg", "/setactive", "TEST-GUID-HIGH-PERFORMANCE"],
+            capture_output=True, text=True, encoding='utf-8', errors='replace'
+        )
 
 if __name__ == '__main__':
     unittest.main()
