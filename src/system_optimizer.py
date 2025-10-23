@@ -184,3 +184,42 @@ def optimize_visual_effects():
     print(f"\nOptimización de efectos visuales completada. Se aplicaron {changes_applied} cambios.")
     logger.info(f"Finalizada la optimización de efectos visuales. Cambios aplicados: {changes_applied}")
 
+def optimize_services():
+    """Orquesta la desactivación de servicios no esenciales de Windows."""
+    utils.show_header("Módulo de Optimización de Servicios")
+    logger.info("Iniciando la optimización de servicios.")
+
+    config = config_manager.load_config('services_to_optimize.json')
+    services_to_disable = config.get('services', [])
+
+    if not services_to_disable:
+        print("No se encontraron configuraciones para la optimización de servicios.")
+        logger.warning("El archivo 'services_to_optimize.json' no se encontró o está vacío.")
+        return
+
+    changes_applied = 0
+    for i, service in enumerate(services_to_disable, 1):
+        service_name = service.get('name', 'SinNombre')
+        description = service.get('description', 'Sin descripción')
+        print(f"\n--- {i}. Deshabilitando: {service_name} ---")
+        print(f"Descripción: {description}")
+
+        status = get_service_status(service_name)
+
+        if status and status.get('startup', '').upper() == 'DISABLED':
+            print(f"El servicio '{service_name}' ya se encuentra deshabilitado.")
+            continue
+        
+        success = set_service_startup_type(service_name, 'disabled')
+
+        if success:
+            print(f"Éxito: El servicio '{service_name}' ha sido configurado como deshabilitado.")
+            changes_applied += 1
+        else:
+            print(f"Error al deshabilitar el servicio '{service_name}'.")
+            logger.error(f"Fallo al cambiar el tipo de inicio para el servicio '{service_name}'.")
+
+    print(f"\nOptimización de servicios completada. Se intentaron {changes_applied} cambios.")
+    logger.info(f"Finalizada la optimización de servicios. Cambios intentados: {changes_applied}")
+
+

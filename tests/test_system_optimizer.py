@@ -164,6 +164,42 @@ class TestSystemOptimizer(unittest.TestCase):
         ]
         mock_set_registry_value.assert_has_calls(expected_calls, any_order=True)
 
+    @patch('src.system_optimizer.get_service_status')
+    @patch('src.system_optimizer.set_service_startup_type')
+    @patch('src.system_optimizer.config_manager.load_config')
+    def test_optimize_services(self, mock_load_config, mock_set_service, mock_get_status):
+        """
+        Prueba que la función de optimización de servicios carga la configuración,
+        comprueba el estado del servicio y llama a la utilidad para deshabilitarlo.
+        """
+        # Arrange: Configuración simulada de servicios y estado
+        mock_services_config = {
+            "services": [
+                {"name": "TestService1", "description": "A test service"},
+                {"name": "TestService2", "description": "Another test service"}
+            ]
+        }
+        mock_load_config.return_value = mock_services_config
+        mock_set_service.return_value = True  # Simula éxito
+        mock_get_status.return_value = {'startup': 'AUTO_START'} # Simula que no está deshabilitado
+
+        # Act: Llama a la función que estamos probando
+        system_optimizer.optimize_services()
+
+        # Assert: Verifica las llamadas a los mocks
+        mock_load_config.assert_called_once_with("services_to_optimize.json")
+
+        # Verifica que se comprueba el estado de cada servicio
+        status_calls = [call("TestService1"), call("TestService2")]
+        mock_get_status.assert_has_calls(status_calls, any_order=True)
+
+        # Verifica que se intenta deshabilitar cada servicio
+        set_service_calls = [
+            call("TestService1", "disabled"),
+            call("TestService2", "disabled")
+        ]
+        mock_set_service.assert_has_calls(set_service_calls, any_order=True)
+
 
 if __name__ == '__main__':
     unittest.main()
