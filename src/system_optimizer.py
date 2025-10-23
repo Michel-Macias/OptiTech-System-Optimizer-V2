@@ -222,4 +222,34 @@ def optimize_services():
     print(f"\nOptimización de servicios completada. Se intentaron {changes_applied} cambios.")
     logger.info(f"Finalizada la optimización de servicios. Cambios intentados: {changes_applied}")
 
+def optimize_power_plan():
+    """Activa el plan de energía de alto rendimiento de Windows."""
+    utils.show_header("Módulo de Optimización de Plan de Energía")
+    logger.info("Iniciando la optimización del plan de energía.")
 
+    config = config_manager.load_config('power_plan_settings.json')
+    high_performance_guid = config.get('high_performance_guid')
+
+    if not high_performance_guid:
+        print("No se encontró el GUID del plan de energía de alto rendimiento en la configuración.")
+        logger.error("GUID del plan de energía de alto rendimiento no encontrado en 'power_plan_settings.json'.")
+        return False
+
+    try:
+        cmd = ["powercfg", "/setactive", high_performance_guid]
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
+
+        if result.returncode == 0:
+            print("Éxito: Plan de energía de alto rendimiento activado.")
+            logger.info("Plan de energía de alto rendimiento activado con éxito.")
+            return True
+        else:
+            print(f"Error al activar el plan de energía: {result.stderr}")
+            logger.error(f"Fallo al activar el plan de energía. Salida: {result.stderr}")
+            return False
+    except FileNotFoundError:
+        logger.error("El comando 'powercfg' no se encontró. Asegúrese de que está en el PATH del sistema.")
+        return False
+    except Exception as e:
+        logger.error(f"Error inesperado al activar el plan de energía: {e}", exc_info=True)
+        return False
