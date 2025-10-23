@@ -1,6 +1,35 @@
 # src/config_manager.py
 
 import os
+import json
+
+# (el resto del código existente permanece igual)
+
+def load_config(config_filename):
+    """
+    Carga un archivo de configuración JSON desde el directorio 'config'.
+
+    Args:
+        config_filename (str): El nombre del archivo JSON a cargar.
+
+    Returns:
+        list or dict: El contenido del archivo JSON, o una lista vacía si ocurre un error.
+    """
+    # Asume que el script se ejecuta desde la raíz del proyecto
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', config_filename)
+    config_path = os.path.abspath(config_path)
+    
+    try:
+        with open(config_path, 'r', encoding=DEFAULT_ENCODING) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # En un sistema real, aquí usaríamos el logger del proyecto
+        print(f"Advertencia: El archivo de configuración no se encontró en {config_path}")
+        return []
+    except json.JSONDecodeError:
+        print(f"Error: El archivo JSON está mal formado: {config_path}")
+        return []
+
 
 APP_NAME = "OptiTechOptimizer"
 DEFAULT_ENCODING = "utf-8"

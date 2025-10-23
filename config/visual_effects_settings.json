@@ -1,0 +1,38 @@
+[
+  {
+    "description": "Desactivar animaciones de menú",
+    "hive": "HKEY_CURRENT_USER",
+    "key": "Control Panel\Desktop",
+    "value_name": "MenuShowDelay",
+    "optimized_value": "0",
+    "default_value": "400",
+    "value_type": "REG_SZ"
+  },
+  {
+    "description": "Desactivar animaciones de ventana al minimizar y maximizar",
+    "hive": "HKEY_CURRENT_USER",
+    "key": "Control Panel\Desktop\WindowMetrics",
+    "value_name": "MinAnimate",
+    "optimized_value": "0",
+    "default_value": "1",
+    "value_type": "REG_SZ"
+  },
+  {
+    "description": "Desactivar efectos de desvanecimiento o deslizamiento",
+    "hive": "HKEY_CURRENT_USER",
+    "key": "Control Panel\Desktop",
+    "value_name": "UserPreferencesMask",
+    "optimized_value": "9E 00 00 00",
+    "default_value": "9E 1E 07 80",
+    "value_type": "REG_BINARY"
+  },
+  {
+    "description": "Desactivar transparencias (Aero)",
+    "hive": "HKEY_CURRENT_USER",
+    "key": "Software\Microsoft\Windows\DWM",
+    "value_name": "EnableAeroPeek",
+    "optimized_value": 0,
+    "default_value": 1,
+    "value_type": "REG_DWORD"
+  }
+]
