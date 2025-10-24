@@ -31,7 +31,7 @@
 - [x] Implementar Optimize-VisualEffects (Ajusta efectos visuales)
 - [x] Implementar Optimize-Services (Desactiva servicios no críticos)
 - [x] Implementar Optimize-PowerPlan (Activa plan de energía de alto rendimiento)
-- [ ] Implementar Optimize-Network (Reinicia configuración de red)
+- [x] Implementar Optimize-Network (Reinicia configuración de red)
 - [ ] Implementar Run-Optimizer (Permite optimización rápida o completa)
 
 ## 6. Mantenimiento y Backups
