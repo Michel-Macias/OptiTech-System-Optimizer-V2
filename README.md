@@ -20,6 +20,7 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
     *   [x] Optimización de Efectos Visuales
     *   [x] Optimización de Servicios
     *   [x] Optimización de Plan de Energía
+    *   [x] Optimización de Red
 *   [ ] **Módulo 6: Mantenimiento y Backups**
 *   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
 
@@ -45,7 +46,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la funcionalidad para **reiniciar la configuración de red (Optimize-Network)**.
+El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la **función principal del optimizador (Run-Optimizer)**.
 
 ## Cómo Contribuir
 
