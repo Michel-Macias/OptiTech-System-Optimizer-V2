@@ -253,3 +253,48 @@ def optimize_power_plan():
     except Exception as e:
         logger.error(f"Error inesperado al activar el plan de energía: {e}", exc_info=True)
         return False
+
+def optimize_network():
+    """Ejecuta una serie de comandos para reiniciar la configuración de red de Windows."""
+    utils.show_header("Módulo de Optimización de Red")
+    logger.info("Iniciando la optimización de red.")
+
+    commands = {
+        "Liberando IP actual": ["ipconfig", "/release"],
+        "Renovando IP": ["ipconfig", "/renew"],
+        "Limpiando caché DNS": ["ipconfig", "/flushdns"],
+        "Reiniciando Winsock": ["netsh", "winsock", "reset"],
+        "Reiniciando Pila IP": ["netsh", "int", "ip", "reset"]
+    }
+
+    all_successful = True
+    for description, command in commands.items():
+        print(f"\n--- Ejecutando: {description} ---")
+        logger.info(f"Ejecutando comando de red: {' '.join(command)}")
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            logger.info(f"Comando '{' '.join(command)}' ejecutado con éxito. Salida:\n{result.stdout}")
+            print("Comando ejecutado con éxito.")
+        except FileNotFoundError:
+            logger.error(f"Error: El comando '{command[0]}' no se encontró.")
+            print(f"Error: El comando '{command[0]}' no se encontró. No se puede continuar.")
+            all_successful = False
+            break
+        except subprocess.CalledProcessError as e:
+            logger.error(f"El comando '{' '.join(command)}' falló. Salida:\n{e.stderr}")
+            print(f"Error al ejecutar el comando. Detalles: {e.stderr}")
+            all_successful = False
+        except Exception as e:
+            logger.error(f"Error inesperado al ejecutar '{' '.join(command)}': {e}", exc_info=True)
+            print(f"Ocurrió un error inesperado: {e}")
+            all_successful = False
+
+    if all_successful:
+        print("\nOptimización de red completada con éxito.")
+        logger.info("Todos los comandos de optimización de red se ejecutaron correctamente.")
+    else:
+        print("\nOptimización de red completada con errores.")
+        logger.warning("Algunos comandos de optimización de red no se pudieron completar.")
+
+    print("Es posible que necesites reiniciar el equipo para que todos los cambios surtan efecto.")
+    return all_successful

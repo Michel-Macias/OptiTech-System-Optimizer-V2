@@ -222,5 +222,24 @@ class TestSystemOptimizer(unittest.TestCase):
             capture_output=True, text=True, encoding='utf-8', errors='replace'
         )
 
+    @patch('subprocess.run')
+    def test_optimize_network(self, mock_run):
+        """
+        Prueba que la función de optimización de red llama a los comandos correctos.
+        """
+        # Arrange: Configura el mock para simular éxito en todos los comandos
+        mock_run.return_value = unittest.mock.Mock(returncode=0)
+
+        # Act: Llama a la función que estamos probando
+        system_optimizer.optimize_network()
+
+        # Assert: Verifica que se llamaron los comandos de red esperados
+        expected_commands = [
+            call(["ipconfig", "/flushdns"], capture_output=True, text=True, check=True),
+            call(["netsh", "winsock", "reset"], capture_output=True, text=True, check=True),
+            call(["netsh", "int", "ip", "reset"], capture_output=True, text=True, check=True)
+        ]
+        mock_run.assert_has_calls(expected_commands, any_order=False)
+
 if __name__ == '__main__':
     unittest.main()
