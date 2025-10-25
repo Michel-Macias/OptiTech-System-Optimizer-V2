@@ -85,31 +85,23 @@ class TestSystemOptimizer(unittest.TestCase):
         # Verificamos que la función devuelve True en caso de éxito
         self.assertTrue(result)
 
-    @patch('src.system_optimizer.set_service_startup_type')
-    @patch('src.utils.confirm_operation')
-    @patch('src.system_optimizer.get_service_status')
-    @patch('src.system_optimizer.load_optimization_profiles')
-    def test_run_optimizer_disables_one_service(self, mock_load_profiles, mock_get_status, mock_confirm, mock_set_service):
+    @patch('src.system_optimizer.optimize_network')
+    @patch('src.system_optimizer.optimize_power_plan')
+    @patch('src.system_optimizer.optimize_services')
+    @patch('src.system_optimizer.optimize_visual_effects')
+    @patch('builtins.input', side_effect=['1', '5'])
+    def test_run_optimizer_menu_selection(self, mock_input, mock_visual_effects, mock_services, mock_power_plan, mock_network):
         """
-        Prueba el flujo completo de run_optimizer:
-        - Carga un servicio.
-        - El usuario confirma la optimización.
-        - Se llama a la función para deshabilitar el servicio.
+        Prueba que el menú de Run-Optimizer llama a la función correcta según la selección del usuario.
         """
-        # Configuración de los mocks
-        mock_load_profiles.return_value = [{'name': 'TestService', 'description': 'A test service.'}]
-        mock_get_status.return_value = {'state': 'RUNNING', 'startup': 'AUTO_START'}
-        mock_confirm.return_value = True  # Simula que el usuario presiona 'y'
-        mock_set_service.return_value = True
-
-        # Ejecutamos la función a probar
+        # Act
         system_optimizer.run_optimizer()
 
-        # Verificaciones
-        mock_load_profiles.assert_called_once()
-        mock_get_status.assert_called_once_with('TestService')
-        mock_confirm.assert_called_once()
-        mock_set_service.assert_called_once_with('TestService', 'disabled')
+        # Assert
+        mock_visual_effects.assert_called_once()
+        mock_services.assert_not_called()
+        mock_power_plan.assert_not_called()
+        mock_network.assert_not_called()
 
     @patch('src.utils.set_registry_value')
     @patch('src.config_manager.load_config')
@@ -235,11 +227,14 @@ class TestSystemOptimizer(unittest.TestCase):
 
         # Assert: Verifica que se llamaron los comandos de red esperados
         expected_commands = [
+            call(["ipconfig", "/release"], capture_output=True, text=True, check=True),
+            call(["ipconfig", "/renew"], capture_output=True, text=True, check=True),
             call(["ipconfig", "/flushdns"], capture_output=True, text=True, check=True),
             call(["netsh", "winsock", "reset"], capture_output=True, text=True, check=True),
             call(["netsh", "int", "ip", "reset"], capture_output=True, text=True, check=True)
         ]
         mock_run.assert_has_calls(expected_commands, any_order=False)
+
 
 if __name__ == '__main__':
     unittest.main()
