@@ -153,3 +153,33 @@ def run_sfc():
         logger.error(f"Error inesperado durante el escaneo SFC: {e}", exc_info=True)
         print(f"Ocurrió un error inesperado: {e}")
         return False
+
+def run_dism():
+    """Ejecuta DISM para reparar la imagen de Windows."""
+    logger.info("Iniciando DISM /Online /Cleanup-Image /RestoreHealth.")
+    try:
+        print("Ejecutando DISM. Esto puede tardar varios minutos...")
+        command = ["DISM", "/Online", "/Cleanup-Image", "/RestoreHealth"]
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        if result.returncode == 0:
+            logger.info("DISM completado con éxito.")
+            print("DISM completado con éxito.")
+            return True
+        else:
+            logger.error(f"Error durante la ejecución de DISM. Stderr: {result.stderr}")
+            print(f"Error durante la ejecución de DISM: {result.stderr}")
+            return False
+
+    except FileNotFoundError:
+        logger.error("El comando 'DISM' no se encontró. Asegúrese de que está en el PATH del sistema.")
+        print("Error: El comando 'DISM' no se encontró.")
+        return False
+    except subprocess.CalledProcessError as e:
+        logger.error(f"El comando DISM falló. Stderr: {e.stderr}")
+        print(f"Error durante la ejecución de DISM: {e.stderr}")
+        return False
+    except Exception as e:
+        logger.error(f"Error inesperado durante la ejecución de DISM: {e}", exc_info=True)
+        print(f"Ocurrió un error inesperado: {e}")
+        return False
