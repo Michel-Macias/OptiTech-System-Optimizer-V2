@@ -38,7 +38,7 @@
 - [x] Implementar Backup-Registry / Restore-Registry
 - [x] Implementar Backup-SystemRestore
 - [x] Implementar Run-SFC
-- [ ] Implementar Run-DISM
+- [x] Implementar Run-DISM
 - [ ] Implementar Run-CHKDSK
 - [ ] Implementar Run-Maintenance (Menú para ejecutar tareas de mantenimiento)
 
