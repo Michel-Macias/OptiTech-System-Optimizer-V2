@@ -27,6 +27,7 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
     *   [x] Ejecución de SFC (System File Checker)
     *   [x] Ejecución de DISM (Deployment Image Servicing and Management)
     *   [x] Ejecución de CHKDSK (Check Disk)
+    *   [x] Menú de Mantenimiento
 *   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
 
 ## Funcionalidades Clave
@@ -51,7 +52,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El trabajo en los módulos 1 a 5 está completo, y el **Módulo 6: Mantenimiento y Backups** está en progreso. La próxima tarea es la implementación de la funcionalidad para **ejecutar tareas de mantenimiento (Run-Maintenance)**.
+El trabajo en los módulos 1 a 6 está completo. El desarrollo actual se centrará en el **Módulo 7: Gestión de Logs**.
 
 ## Cómo Contribuir
 

@@ -152,3 +152,14 @@ Este módulo proporciona herramientas esenciales para mantener la salud de tu si
 
 *   **Beneficio esperado:**
     Mantiene la integridad de tus discos duros, previniendo la pérdida de datos y mejorando la fiabilidad del almacenamiento.
+
+### 5.6. Menú de Mantenimiento
+
+*   **¿Qué hace?**
+    Este es el punto de entrada principal para todas las herramientas de mantenimiento. Presenta un menú interactivo donde puedes seleccionar y ejecutar cualquiera de las funciones de mantenimiento descritas anteriormente (Backup/Restauración del Registro, Puntos de Restauración, SFC, DISM, CHKDSK).
+
+*   **¿Es seguro?**
+    El menú en sí es **seguro**. La seguridad de cada operación individual se describe en sus respectivas secciones.
+
+*   **Beneficio esperado:**
+    Centraliza y facilita el acceso a todas las herramientas de mantenimiento del sistema, permitiéndote realizar tareas de forma organizada y controlada.
