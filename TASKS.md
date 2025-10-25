@@ -39,7 +39,7 @@
 - [x] Implementar Backup-SystemRestore
 - [x] Implementar Run-SFC
 - [x] Implementar Run-DISM
-- [ ] Implementar Run-CHKDSK
+- [x] Implementar Run-CHKDSK
 - [ ] Implementar Run-Maintenance (Menú para ejecutar tareas de mantenimiento)
 
 ## 7. Gestión de Logs

@@ -21,7 +21,12 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
     *   [x] Optimización de Servicios
     *   [x] Optimización de Plan de Energía
     *   [x] Optimización de Red
-*   [ ] **Módulo 6: Mantenimiento y Backups**
+*   [x] **Módulo 6: Mantenimiento y Backups**
+    *   [x] Backup y Restauración del Registro
+    *   [x] Creación de Puntos de Restauración del Sistema
+    *   [x] Ejecución de SFC (System File Checker)
+    *   [x] Ejecución de DISM (Deployment Image Servicing and Management)
+    *   [x] Ejecución de CHKDSK (Check Disk)
 *   [ ] **Módulo 7: Interfaz Principal y Empaquetado**
 
 ## Funcionalidades Clave
@@ -46,7 +51,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El trabajo en los módulos 1 a 5 está completo. El desarrollo actual se centrará en el **Módulo 6: Mantenimiento y Backups**. La próxima tarea es la implementación de la funcionalidad para **realizar copias de seguridad y restauraciones del registro (Backup-Registry / Restore-Registry)**.
+El trabajo en los módulos 1 a 5 está completo, y el **Módulo 6: Mantenimiento y Backups** está en progreso. La próxima tarea es la implementación de la funcionalidad para **ejecutar tareas de mantenimiento (Run-Maintenance)**.
 
 ## Cómo Contribuir
 

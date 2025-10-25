@@ -91,3 +91,64 @@ Este módulo te ofrece un conjunto de herramientas para mejorar el rendimiento y
 
 *   **Beneficio esperado:**
     Puede solucionar problemas de conexión a internet, como lentitud o páginas que no cargan. Es una buena primera medida ante cualquier problema de red.
+
+---
+
+## 5. Mantenimiento y Backups
+
+Este módulo proporciona herramientas esenciales para mantener la salud de tu sistema y protegerte contra posibles problemas.
+
+### 5.1. Backup y Restauración del Registro
+
+*   **¿Qué hace?**
+    Permite crear una copia de seguridad de una parte crítica del registro de Windows (HKEY_CURRENT_USER) en un archivo `.reg`. También puede restaurar el registro desde un archivo de copia de seguridad previamente creado.
+
+*   **¿Es seguro?**
+    La creación de backups es **segura**. La restauración es una operación **crítica** que debe usarse con precaución. Siempre se recomienda crear un punto de restauración del sistema antes de restaurar el registro.
+
+*   **Beneficio esperado:**
+    Protección contra configuraciones erróneas o corrupción del registro, permitiendo revertir a un estado anterior conocido.
+
+### 5.2. Creación de Puntos de Restauración del Sistema
+
+*   **¿Qué hace?**
+    Crea un "punto de restauración" en Windows. Un punto de restauración es una instantánea del estado de los archivos del sistema, programas instalados y configuración del registro en un momento dado.
+
+*   **¿Es seguro?**
+    Sí, es **seguro**. Es una característica nativa de Windows diseñada para revertir el sistema a un estado anterior sin afectar tus archivos personales.
+
+*   **Beneficio esperado:**
+    Proporciona una red de seguridad para deshacer cambios importantes en el sistema, como la instalación de controladores o software problemático.
+
+### 5.3. Ejecutar SFC (System File Checker)
+
+*   **¿Qué hace?**
+    Ejecuta la herramienta "Comprobador de archivos de sistema" de Windows (`sfc /scannow`). Esta herramienta escanea todos los archivos protegidos del sistema en busca de corrupciones y los reemplaza con versiones correctas de Microsoft.
+
+*   **¿Es seguro?**
+    Sí, es **seguro**. Es una herramienta de diagnóstico y reparación integrada en Windows.
+
+*   **Beneficio esperado:**
+    Ayuda a solucionar problemas relacionados con archivos del sistema dañados, que pueden causar inestabilidad o errores en Windows.
+
+### 5.4. Ejecutar DISM (Deployment Image Servicing and Management)
+
+*   **¿Qué hace?**
+    Ejecuta el comando `DISM /Online /Cleanup-Image /RestoreHealth`. Esta herramienta repara la imagen de Windows, lo que puede solucionar problemas más profundos que SFC no puede resolver.
+
+*   **¿Es seguro?**
+    Sí, es **seguro**. Es una herramienta de mantenimiento avanzada de Windows. Puede tardar un tiempo en completarse.
+
+*   **Beneficio esperado:**
+    Repara componentes dañados del sistema operativo, mejorando la estabilidad y el rendimiento general.
+
+### 5.5. Ejecutar CHKDSK (Check Disk)
+
+*   **¿Qué hace?**
+    Ejecuta el comando `chkdsk C: /F /R` (o la unidad que especifiques). Esta herramienta escanea el disco duro en busca de errores en el sistema de archivos y sectores defectuosos, intentando repararlos.
+
+*   **¿Es seguro?**
+    Sí, es **seguro**, pero puede requerir un reinicio del sistema para ejecutarse, especialmente si se corrigen errores en la unidad del sistema.
+
+*   **Beneficio esperado:**
+    Mantiene la integridad de tus discos duros, previniendo la pérdida de datos y mejorando la fiabilidad del almacenamiento.
