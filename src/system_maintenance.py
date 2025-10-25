@@ -213,3 +213,74 @@ def run_chkdsk(drive):
         logger.error(f"Error inesperado durante la ejecución de CHKDSK: {e}", exc_info=True)
         print(f"Ocurrió un error inesperado: {e}")
         return False
+
+def run_maintenance():
+    """Muestra un menú interactivo para que el usuario elija las tareas de mantenimiento a aplicar."""
+    utils.show_header("Módulo de Mantenimiento del Sistema")
+    logger.info("Iniciando el módulo interactivo de mantenimiento.")
+
+    while True:
+        print("\nPor favor, elija una opción de mantenimiento:")
+        print("  1. Backup del Registro")
+        print("  2. Restaurar Registro")
+        print("  3. Crear Punto de Restauración del Sistema")
+        print("  4. Ejecutar SFC (System File Checker)")
+        print("  5. Ejecutar DISM (Deployment Image Servicing and Management)")
+        print("  6. Ejecutar CHKDSK (Check Disk)")
+        print("  7. Volver al Menú Principal")
+
+        choice = input("Seleccione una opción: ").strip()
+
+        if choice == '1':
+            if utils.confirm_operation("¿Está seguro de que desea hacer un backup del registro?"):
+                backup_registry()
+        elif choice == '2':
+            backup_files = [f for f in os.listdir(utils.get_backup_dir()) if f.startswith("registry_backup_") and f.endswith(".reg")]
+            if not backup_files:
+                print("No se encontraron archivos de backup del registro.")
+                logger.warning("Intento de restauración de registro sin archivos de backup disponibles.")
+                continue
+            
+            print("\nArchivos de backup del registro disponibles:")
+            for i, f in enumerate(backup_files, 1):
+                print(f"  {i}. {f}")
+            
+            file_choice = input("Seleccione el número del archivo de backup a restaurar: ").strip()
+            try:
+                selected_file = backup_files[int(file_choice) - 1]
+                full_path = os.path.join(utils.get_backup_dir(), selected_file)
+                if utils.confirm_operation(f"¿Está seguro de que desea restaurar el registro desde {selected_file}? Esta operación es crítica."):
+                    restore_registry(full_path)
+            except (ValueError, IndexError):
+                print("Selección no válida.")
+                logger.warning(f"Selección de archivo de backup no válida: {file_choice}")
+
+        elif choice == '3':
+            if utils.confirm_operation("¿Está seguro de que desea crear un punto de restauración del sistema?"):
+                description = input("Ingrese una descripción para el punto de restauración: ").strip()
+                if description:
+                    create_system_restore_point(description)
+                else:
+                    print("La descripción no puede estar vacía.")
+                    logger.warning("Intento de crear punto de restauración con descripción vacía.")
+        elif choice == '4':
+            if utils.confirm_operation("¿Está seguro de que desea ejecutar SFC /scannow? Esto puede tardar un tiempo."):
+                run_sfc()
+        elif choice == '5':
+            if utils.confirm_operation("¿Está seguro de que desea ejecutar DISM /RestoreHealth? Esto puede tardar un tiempo."):
+                run_dism()
+        elif choice == '6':
+            drive = input("Ingrese la letra de la unidad para CHKDSK (ej. C): ").strip().upper()
+            if drive and len(drive) == 1 and drive.isalpha():
+                if utils.confirm_operation(f"¿Está seguro de que desea ejecutar CHKDSK en la unidad {drive}:? Esto puede requerir un reinicio."):
+                    run_chkdsk(f"{drive}:")
+            else:
+                print("Entrada de unidad no válida.")
+                logger.warning(f"Entrada de unidad CHKDSK no válida: {drive}")
+        elif choice == '7':
+            print("Volviendo al menú principal...")
+            logger.info("Saliendo del módulo de mantenimiento.")
+            break
+        else:
+            print("Opción no válida. Por favor, intente de nuevo.")
+            logger.warning(f"Opción de mantenimiento no válida seleccionada: {choice}")
