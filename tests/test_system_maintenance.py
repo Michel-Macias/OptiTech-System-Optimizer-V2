@@ -55,3 +55,27 @@ class TestSystemMaintenance(unittest.TestCase):
         # Verificar que subprocess.run fue llamado con los argumentos correctos
         mock_subprocess_run.assert_called_once_with(["reg", "import", mock_backup_file], capture_output=True, text=True, check=True)
 
+    @patch('src.system_maintenance.subprocess.run')
+    def test_create_system_restore_point_success(self, mock_subprocess_run):
+        """Prueba que la creación de un punto de restauración del sistema se ejecuta y devuelve True si tiene éxito."""
+        # Configuración del mock
+        mock_subprocess_run.return_value = MagicMock(returncode=0, stdout="Success", stderr="")
+
+        # Llamar a la función
+        description = "Punto de restauración creado por OptiTech System Optimizer"
+        result = system_maintenance.create_system_restore_point(description)
+
+        # Verificaciones
+        self.assertTrue(result)
+        
+        # Verificar que subprocess.run fue llamado con el comando correcto de PowerShell
+        expected_command = [
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"Checkpoint-Computer -Description '{description}' -RestorePointType 'MODIFY_SETTINGS'"
+        ]
+        mock_subprocess_run.assert_called_once_with(expected_command, capture_output=True, text=True, check=True)
+

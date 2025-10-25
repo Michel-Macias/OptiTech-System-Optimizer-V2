@@ -36,7 +36,7 @@
 
 ## 6. Mantenimiento y Backups
 - [x] Implementar Backup-Registry / Restore-Registry
-- [ ] Implementar Backup-SystemRestore
+- [x] Implementar Backup-SystemRestore
 - [ ] Implementar Run-SFC
 - [ ] Implementar Run-DISM
 - [ ] Implementar Run-CHKDSK
