@@ -10,6 +10,37 @@ from src import config_manager
 APP_LOGGER_NAME = 'OptiTechOptimizer'
 logger = logging.getLogger(APP_LOGGER_NAME)
 
+def run_optimizer():
+    """Muestra un menú interactivo para que el usuario elija las optimizaciones a aplicar."""
+    utils.show_header("Módulo de Optimización del Sistema")
+    logger.info("Iniciando el módulo interactivo de optimización.")
+
+    while True:
+        print("\nPor favor, elija una opción de optimización:")
+        print("  1. Optimizar Efectos Visuales (Recomendado)")
+        print("  2. Optimizar Servicios No Esenciales")
+        print("  3. Activar Plan de Máximo Rendimiento")
+        print("  4. Optimizar y Reiniciar Red")
+        print("  5. Volver al Menú Principal")
+
+        choice = input("Seleccione una opción: ").strip()
+
+        if choice == '1':
+            optimize_visual_effects()
+        elif choice == '2':
+            optimize_services()
+        elif choice == '3':
+            optimize_power_plan()
+        elif choice == '4':
+            optimize_network()
+        elif choice == '5':
+            print("Volviendo al menú principal...")
+            logger.info("Saliendo del módulo de optimización.")
+            break
+        else:
+            print("Opción no válida. Por favor, intente de nuevo.")
+            logger.warning(f"Opción de optimización no válida seleccionada: {choice}")
+
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'config', 'services_to_optimize.json')
 
 def load_optimization_profiles(file_path=CONFIG_FILE_PATH):
@@ -105,49 +136,6 @@ def set_service_startup_type(service_name, startup_type):
         logger.error(f"Error inesperado al cambiar el tipo de inicio del servicio {service_name}: {e}", exc_info=True)
         return False
 
-def run_optimizer():
-    """Función principal que orquesta la optimización de servicios."""
-    utils.show_header("Módulo de Optimización del Sistema")
-    logger.info("Iniciando módulo de optimización del sistema.")
-
-    services_to_optimize = load_optimization_profiles()
-
-    if not services_to_optimize:
-        print("No se encontraron perfiles de optimización o el archivo de configuración está vacío.")
-        return
-
-    print("Se analizarán los siguientes servicios para su posible optimización:")
-    optimizations_applied = 0
-
-    for i, service in enumerate(services_to_optimize, 1):
-        service_name = service['name']
-        print(f"\n--- {i}. Analizando '{service_name}' ---")
-        print(f"Descripción: {service['description']}")
-
-        status = get_service_status(service_name)
-        if not status or status['state'] == 'NOT_FOUND':
-            print(f"El servicio '{service_name}' no se encontró en el sistema. Omitiendo.")
-            logger.warning(f"Servicio '{service_name}' del perfil de optimización no encontrado.")
-            continue
-
-        print(f"Estado actual: {status['state']} | Inicio: {status['startup']}")
-
-        if status['startup'] == 'DISABLED':
-            print(f"El servicio '{service_name}' ya está deshabilitado. No se requiere acción.")
-            continue
-
-        prompt = f"¿Desea deshabilitar el servicio '{service_name}'?"
-        if utils.confirm_operation(prompt):
-            if set_service_startup_type(service_name, 'disabled'):
-                print(f"Éxito: El servicio '{service_name}' ha sido deshabilitado.")
-                optimizations_applied += 1
-            else:
-                print(f"Error: No se pudo deshabilitar el servicio '{service_name}'.")
-        else:
-            print(f"Operación cancelada para el servicio '{service_name}'.")
-
-    print(f"\nOptimización completada. Se aplicaron {optimizations_applied} cambios.")
-    logger.info(f"Módulo de optimización finalizado. Cambios aplicados: {optimizations_applied}")
 
 def optimize_visual_effects():
     """Orquesta la optimización de los efectos visuales de Windows."""
