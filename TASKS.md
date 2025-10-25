@@ -32,7 +32,7 @@
 - [x] Implementar Optimize-Services (Desactiva servicios no críticos)
 - [x] Implementar Optimize-PowerPlan (Activa plan de energía de alto rendimiento)
 - [x] Implementar Optimize-Network (Reinicia configuración de red)
-- [ ] Implementar Run-Optimizer (Permite optimización rápida o completa)
+- [x] Implementar Run-Optimizer (Permite optimización rápida o completa)
 
 ## 6. Mantenimiento y Backups
 - [ ] Implementar Backup-Registry / Restore-Registry

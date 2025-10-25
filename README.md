@@ -16,7 +16,7 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
 *   [x] **Módulo 2: Funciones de Utilidad**: Implementación de helpers para la interfaz de usuario como encabezados, barras de progreso y confirmaciones.
 *   [x] **Módulo 3: Análisis del Sistema**: Implementación de la capacidad de recopilar y guardar informes detallados sobre el SO, hardware, servicios y uso de recursos.
 *   [x] **Módulo 4: Limpieza del Sistema**: Implementación de funciones para limpiar archivos temporales, vaciar la papelera de reciclaje, limpiar WinSxS y eliminar copias de sombra.
-*   [ ] **Módulo 5: Optimización del Sistema**
+*   [x] **Módulo 5: Optimización del Sistema**
     *   [x] Optimización de Efectos Visuales
     *   [x] Optimización de Servicios
     *   [x] Optimización de Plan de Energía
@@ -46,7 +46,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-El trabajo previo en los módulos 1 a 4 está completo y documentado. El desarrollo actual se centra en el **Módulo 5: Optimización del Sistema**. La próxima tarea es la implementación de la **función principal del optimizador (Run-Optimizer)**.
+El trabajo en los módulos 1 a 5 está completo. El desarrollo actual se centrará en el **Módulo 6: Mantenimiento y Backups**. La próxima tarea es la implementación de la funcionalidad para **realizar copias de seguridad y restauraciones del registro (Backup-Registry / Restore-Registry)**.
 
 ## Cómo Contribuir
 
