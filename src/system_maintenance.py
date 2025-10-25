@@ -123,3 +123,33 @@ def create_system_restore_point(description):
         logger.error(f"Error inesperado durante la creación del punto de restauración: {e}", exc_info=True)
         print(f"Ocurrió un error inesperado: {e}")
         return False
+
+def run_sfc():
+    """Ejecuta el System File Checker (SFC) para escanear y reparar archivos del sistema."""
+    logger.info("Iniciando escaneo SFC (System File Checker).")
+    try:
+        print("Ejecutando SFC /scannow. Esto puede tardar varios minutos...")
+        command = ["sfc", "/scannow"]
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        if result.returncode == 0:
+            logger.info("Escaneo SFC completado con éxito.")
+            print("Escaneo SFC completado con éxito.")
+            return True
+        else:
+            logger.error(f"Error durante el escaneo SFC. Stderr: {result.stderr}")
+            print(f"Error durante el escaneo SFC: {result.stderr}")
+            return False
+
+    except FileNotFoundError:
+        logger.error("El comando 'sfc' no se encontró. Asegúrese de que está en el PATH del sistema.")
+        print("Error: El comando 'sfc' no se encontró.")
+        return False
+    except subprocess.CalledProcessError as e:
+        logger.error(f"El comando SFC falló. Stderr: {e.stderr}")
+        print(f"Error durante el escaneo SFC: {e.stderr}")
+        return False
+    except Exception as e:
+        logger.error(f"Error inesperado durante el escaneo SFC: {e}", exc_info=True)
+        print(f"Ocurrió un error inesperado: {e}")
+        return False
