@@ -52,3 +52,42 @@ Esta opción ajusta la apariencia de Windows para que el sistema se sienta más 
 
 *   **Beneficio esperado:**
     La interfaz de Windows responderá de forma más instantánea, dando una sensación de mayor velocidad, especialmente en equipos más modestos.
+
+---
+
+## 4. Optimización del Sistema
+
+Este módulo te ofrece un conjunto de herramientas para mejorar el rendimiento y la configuración de tu sistema. Puedes elegir qué optimizaciones aplicar desde un menú interactivo.
+
+### 4.1. Optimización de Servicios No Esenciales
+
+*   **¿Qué hace?**
+    Deshabilita ciertos servicios de Windows que no son críticos para el funcionamiento diario de la mayoría de los usuarios (como la telemetría o servicios de fax). 
+
+*   **¿Es seguro?**
+    Sí, es una optimización **muy segura**. Los servicios seleccionados son conocidos por ser prescindibles en entornos de oficina típicos. En el improbable caso de que necesites uno de ellos, se pueden reactivar manualmente desde la consola de servicios de Windows.
+
+*   **Beneficio esperado:**
+    Liberar una pequeña cantidad de memoria RAM y recursos del procesador, contribuyendo a un sistema ligeramente más ágil.
+
+### 4.2. Activar Plan de Máximo Rendimiento
+
+*   **¿Qué hace?**
+    Cambia el plan de energía de Windows al de "Máximo rendimiento". Este plan prioriza el rendimiento sobre el ahorro de energía.
+
+*   **¿Es seguro?**
+    Sí, es **totalmente seguro**. Es un ajuste estándar de Windows. Ten en cuenta que en portátiles, esto consumirá la batería más rápidamente.
+
+*   **Beneficio esperado:**
+    El procesador y otros componentes funcionarán a su máxima capacidad de forma más consistente, lo que puede mejorar la velocidad en tareas exigentes. Ideal para ordenadores de sobremesa.
+
+### 4.3. Optimizar y Reiniciar Red
+
+*   **¿Qué hace?**
+    Ejecuta una serie de comandos estándar de Windows para reiniciar la configuración de red. Esto limpia la caché de DNS, reinicia la pila de red y renueva la dirección IP.
+
+*   **¿Es seguro?**
+    Sí, es **muy seguro**. Es el equivalente a ejecutar los comandos de solución de problemas de red más comunes. Perderás la conectividad a internet durante unos segundos mientras se ejecutan los comandos.
+
+*   **Beneficio esperado:**
+    Puede solucionar problemas de conexión a internet, como lentitud o páginas que no cargan. Es una buena primera medida ante cualquier problema de red.
