@@ -35,12 +35,12 @@
 - [x] Implementar Run-Optimizer (Permite optimización rápida o completa)
 
 ## 6. Mantenimiento y Backups
-- [ ] Implementar Backup-Registry / Restore-Registry
-- [ ] Implementar Backup-SystemRestore
-- [ ] Implementar Run-SFC
-- [ ] Implementar Run-DISM
-- [ ] Implementar Run-CHKDSK
-- [ ] Implementar Run-Maintenance (Menú para ejecutar tareas de mantenimiento)
+- [x] Implementar Backup-Registry / Restore-Registry
+- [x] Implementar Backup-SystemRestore
+- [x] Implementar Run-SFC
+- [x] Implementar Run-DISM
+- [x] Implementar Run-CHKDSK
+- [x] Implementar Run-Maintenance (Menú para ejecutar tareas de mantenimiento)
 
 ## 7. Gestión de Logs
 - [ ] Implementar View-Logs (Visualiza logs, permite rotación y eliminación)
