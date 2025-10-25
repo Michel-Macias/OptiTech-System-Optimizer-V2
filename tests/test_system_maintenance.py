@@ -110,3 +110,19 @@ class TestSystemMaintenance(unittest.TestCase):
         expected_command = ["DISM", "/Online", "/Cleanup-Image", "/RestoreHealth"]
         mock_subprocess_run.assert_called_once_with(expected_command, capture_output=True, text=True, check=True)
 
+    @patch('src.system_maintenance.subprocess.run')
+    def test_run_chkdsk_success(self, mock_subprocess_run):
+        """Prueba que el escaneo CHKDSK se ejecuta y devuelve True si tiene éxito."""
+        # Configuración del mock
+        mock_subprocess_run.return_value = MagicMock(returncode=0, stdout="Success", stderr="")
+
+        # Llamar a la función
+        result = system_maintenance.run_chkdsk('C:')
+
+        # Verificaciones
+        self.assertTrue(result)
+        
+        # Verificar que subprocess.run fue llamado con el comando correcto
+        expected_command = ["chkdsk", "C:", "/F", "/R"]
+        mock_subprocess_run.assert_called_once_with(expected_command, capture_output=True, text=True, check=True)
+

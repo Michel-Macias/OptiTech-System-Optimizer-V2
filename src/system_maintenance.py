@@ -183,3 +183,33 @@ def run_dism():
         logger.error(f"Error inesperado durante la ejecución de DISM: {e}", exc_info=True)
         print(f"Ocurrió un error inesperado: {e}")
         return False
+
+def run_chkdsk(drive):
+    """Ejecuta CHKDSK en una unidad específica."""
+    logger.info(f"Iniciando CHKDSK en la unidad {drive}.")
+    try:
+        print(f"Ejecutando CHKDSK en la unidad {drive}. Esto puede tardar varios minutos...")
+        command = ["chkdsk", drive, "/F", "/R"]
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        if result.returncode == 0:
+            logger.info(f"CHKDSK en la unidad {drive} completado con éxito.")
+            print(f"CHKDSK en la unidad {drive} completado con éxito.")
+            return True
+        else:
+            logger.error(f"Error durante la ejecución de CHKDSK en la unidad {drive}. Stderr: {result.stderr}")
+            print(f"Error durante la ejecución de CHKDSK en la unidad {drive}: {result.stderr}")
+            return False
+
+    except FileNotFoundError:
+        logger.error("El comando 'chkdsk' no se encontró. Asegúrese de que está en el PATH del sistema.")
+        print("Error: El comando 'chkdsk' no se encontró.")
+        return False
+    except subprocess.CalledProcessError as e:
+        logger.error(f"El comando CHKDSK falló. Stderr: {e.stderr}")
+        print(f"Error durante la ejecución de CHKDSK: {e.stderr}")
+        return False
+    except Exception as e:
+        logger.error(f"Error inesperado durante la ejecución de CHKDSK: {e}", exc_info=True)
+        print(f"Ocurrió un error inesperado: {e}")
+        return False
