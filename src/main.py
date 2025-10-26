@@ -9,6 +9,7 @@ from src import config_manager
 from src import system_cleaner
 from src import system_analysis
 from src import system_optimizer
+from src import system_maintenance
 from src import utils
 from src import log_manager
 
@@ -55,7 +56,8 @@ def main():
         print("  1. Ejecutar Análisis del Sistema")
         print("  2. Ejecutar Limpiador del Sistema")
         print("  3. Ejecutar Optimizador del Sistema")
-        print("  4. Ver Logs del Sistema")
+        print("  4. Ejecutar Mantenimiento del Sistema")
+        print("  5. Ver Logs del Sistema")
         print("  0. Salir")
 
         opcion = input("Ingrese su opción: ").strip()
@@ -67,6 +69,8 @@ def main():
         elif opcion == '3':
             system_optimizer.run_optimizer()
         elif opcion == '4':
+            system_maintenance.run_maintenance()
+        elif opcion == '5':
             log_manager.view_logs(config_manager.get_log_path())
         elif opcion == '0':
             app_logger.info("Aplicación finalizada.")
