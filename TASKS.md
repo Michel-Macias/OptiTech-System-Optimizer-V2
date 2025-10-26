@@ -43,7 +43,7 @@
 - [x] Implementar Run-Maintenance (Menú para ejecutar tareas de mantenimiento)
 
 ## 7. Gestión de Logs
-- [ ] Implementar View-Logs (Visualiza logs, permite rotación y eliminación)
+- [x] Implementar View-Logs (Visualiza logs, permite rotación y eliminación)
 
 ## 8. Bucle Principal
 - [ ] Implementar Menú principal con opciones (análisis, limpieza, optimización, mantenimiento, logs, salir)
