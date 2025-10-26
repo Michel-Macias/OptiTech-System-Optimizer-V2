@@ -51,6 +51,6 @@
 ## 9. Consideraciones Técnicas
 - [x] Asegurar Modularidad
 - [x] Implementar Seguridad (confirmaciones, puntos de restauración)
-- [ ] Asegurar Compatibilidad con Windows 11
-- [ ] Implementar Logging robusto
-- [ ] Asegurar Interactividad (menús y confirmaciones)
+- [x] Asegurar Compatibilidad con Windows 11
+- [x] Implementar Logging robusto
+- [x] Asegurar Interactividad (menús y confirmaciones)
