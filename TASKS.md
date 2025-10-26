@@ -24,7 +24,7 @@
 - [x] Implementar Clear-TempFiles (Limpieza según nivel)
 - [x] Implementar Clear-RecycleBinSafe
 - [x] Implementar Clear-WinSxS
-- [x] Implementar Clear-ShadowCopies
+- [x] Implementar Clear-ShadowCopies (Manejo de errores y verificación de privilegios mejorados)
 - [x] Implementar Run-Cleaner (Menú interactivo para elegir nivel o modo informe)
 
 ## 5. Optimización del Sistema

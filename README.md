@@ -47,7 +47,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 *   **Sistema Operativo Objetivo**: Exclusivamente Windows 11.
 *   **Arquitectura**: Modular, facilitando el mantenimiento y la escalabilidad.
 *   **Distribución**: Ejecutable autónomo (`.exe`) generado con `PyInstaller`.
-*   **Seguridad**: Implementación robusta de elevación de privilegios (UAC), validación de entradas, confirmaciones explícitas para operaciones críticas y logging detallado.
+*   **Seguridad**: Implementación robusta de elevación de privilegios (UAC), validación de entradas, confirmaciones explícitas para operaciones críticas y logging detallado. **Nota Importante**: Algunas funcionalidades, como la eliminación de copias de sombra o la limpieza de WinSxS, requieren que la aplicación se ejecute con privilegios de administrador. Si no se ejecuta como administrador, estas funciones informarán al usuario y no se ejecutarán.
 *   **Rendimiento**: Optimización del código Python y, cuando sea necesario, invocación de comandos nativos de Windows o PowerShell para tareas de bajo nivel.
 
 ## Estado Actual del Desarrollo

@@ -5,6 +5,7 @@ import logging
 import winshell
 import subprocess
 from src import utils
+from src.privileges import is_admin
 
 APP_LOGGER_NAME = 'OptiTechOptimizer'
 logger = logging.getLogger(APP_LOGGER_NAME)
@@ -159,6 +160,11 @@ def limpiar_winsxs():
 def limpiar_copias_sombra():
     """Elimina todas las copias de sombra (Shadow Copies) del sistema."""
     logger.info("Iniciando eliminación de copias de sombra...")
+    if not is_admin():
+        mensaje_error = "Se requieren privilegios de administrador para eliminar copias de sombra. Por favor, ejecute la aplicación como administrador."
+        logger.error(mensaje_error)
+        print(mensaje_error)
+        return False
     try:
         # El comando vssadmin requiere privilegios de administrador
         comando = ["vssadmin", "delete", "shadows", "/all", "/quiet"]
@@ -173,7 +179,7 @@ def limpiar_copias_sombra():
     except subprocess.CalledProcessError as e:
         logger.error(f"Error al ejecutar el comando vssadmin para copias de sombra: {e}", exc_info=True)
         logger.error(f"Salida de error vssadmin: {e.stderr}")
-        print(f"Error al eliminar copias de sombra: {e.stderr}")
+        print(f"Error al eliminar copias de sombra: {e.stderr}. Mensaje de vssadmin: {e.stderr.strip()}")
         return False
     except Exception as e:
         logger.error(f"Ocurrió un error inesperado al eliminar copias de sombra: {e}", exc_info=True)
