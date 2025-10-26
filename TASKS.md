@@ -46,7 +46,7 @@
 - [x] Implementar View-Logs (Visualiza logs, permite rotación y eliminación)
 
 ## 8. Bucle Principal
-- [ ] Implementar Menú principal con opciones (análisis, limpieza, optimización, mantenimiento, logs, salir)
+- [x] Implementar Menú principal con opciones (análisis, limpieza, optimización, mantenimiento, logs, salir)
 
 ## 9. Consideraciones Técnicas
 - [ ] Asegurar Modularidad
