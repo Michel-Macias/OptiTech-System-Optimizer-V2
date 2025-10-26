@@ -139,6 +139,10 @@ def set_service_startup_type(service_name, startup_type):
 
 def optimize_visual_effects():
     """Orquesta la optimización de los efectos visuales de Windows."""
+    if not utils.confirm_operation("¿Está seguro de que desea optimizar los efectos visuales? Esta acción modificará el registro de Windows."):
+        logger.info("Operación de optimización de efectos visuales cancelada por el usuario.")
+        return
+
     utils.show_header("Módulo de Optimización de Efectos Visuales")
     logger.info("Iniciando la optimización de efectos visuales.")
 
@@ -174,6 +178,10 @@ def optimize_visual_effects():
 
 def optimize_services():
     """Orquesta la desactivación de servicios no esenciales de Windows."""
+    if not utils.confirm_operation("¿Está seguro de que desea optimizar los servicios? Esto desactivará servicios que pueden no ser necesarios."):
+        logger.info("Operación de optimización de servicios cancelada por el usuario.")
+        return
+
     utils.show_header("Módulo de Optimización de Servicios")
     logger.info("Iniciando la optimización de servicios.")
 
@@ -212,6 +220,10 @@ def optimize_services():
 
 def optimize_power_plan():
     """Activa el plan de energía de alto rendimiento de Windows."""
+    if not utils.confirm_operation("¿Está seguro de que desea activar el plan de energía de alto rendimiento?"):
+        logger.info("Operación de optimización del plan de energía cancelada por el usuario.")
+        return
+
     utils.show_header("Módulo de Optimización de Plan de Energía")
     logger.info("Iniciando la optimización del plan de energía.")
 
@@ -244,6 +256,10 @@ def optimize_power_plan():
 
 def optimize_network():
     """Ejecuta una serie de comandos para reiniciar la configuración de red de Windows."""
+    if not utils.confirm_operation("¿Está seguro de que desea optimizar la red? Esto reiniciará la configuración de red."):
+        logger.info("Operación de optimización de red cancelada por el usuario.")
+        return
+
     utils.show_header("Módulo de Optimización de Red")
     logger.info("Iniciando la optimización de red.")
 
