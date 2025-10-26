@@ -40,7 +40,11 @@ Esta opción te ayuda a recuperar espacio en tu disco duro eliminando archivos i
 
 ---
 
-## 3. Optimización de Efectos Visuales
+## 4. Optimización del Sistema
+
+Este módulo te ofrece un conjunto de herramientas para mejorar el rendimiento y la configuración de tu sistema. Puedes elegir qué optimizaciones aplicar desde un menú interactivo.
+
+### 4.1. Optimización de Efectos Visuales
 
 Esta opción ajusta la apariencia de Windows para que el sistema se sienta más ágil y rápido.
 
@@ -53,13 +57,7 @@ Esta opción ajusta la apariencia de Windows para que el sistema se sienta más 
 *   **Beneficio esperado:**
     La interfaz de Windows responderá de forma más instantánea, dando una sensación de mayor velocidad, especialmente en equipos más modestos.
 
----
-
-## 4. Optimización del Sistema
-
-Este módulo te ofrece un conjunto de herramientas para mejorar el rendimiento y la configuración de tu sistema. Puedes elegir qué optimizaciones aplicar desde un menú interactivo.
-
-### 4.1. Optimización de Servicios No Esenciales
+### 4.2. Optimización de Servicios No Esenciales
 
 *   **¿Qué hace?**
     Deshabilita ciertos servicios de Windows que no son críticos para el funcionamiento diario de la mayoría de los usuarios (como la telemetría o servicios de fax). 
@@ -70,7 +68,7 @@ Este módulo te ofrece un conjunto de herramientas para mejorar el rendimiento y
 *   **Beneficio esperado:**
     Liberar una pequeña cantidad de memoria RAM y recursos del procesador, contribuyendo a un sistema ligeramente más ágil.
 
-### 4.2. Activar Plan de Máximo Rendimiento
+### 4.3. Activar Plan de Máximo Rendimiento
 
 *   **¿Qué hace?**
     Cambia el plan de energía de Windows al de "Máximo rendimiento". Este plan prioriza el rendimiento sobre el ahorro de energía.
@@ -81,7 +79,7 @@ Este módulo te ofrece un conjunto de herramientas para mejorar el rendimiento y
 *   **Beneficio esperado:**
     El procesador y otros componentes funcionarán a su máxima capacidad de forma más consistente, lo que puede mejorar la velocidad en tareas exigentes. Ideal para ordenadores de sobremesa.
 
-### 4.3. Optimizar y Reiniciar Red
+### 4.4. Optimizar y Reiniciar Red
 
 *   **¿Qué hace?**
     Ejecuta una serie de comandos estándar de Windows para reiniciar la configuración de red. Esto limpia la caché de DNS, reinicia la pila de red y renueva la dirección IP.
@@ -163,3 +161,18 @@ Este módulo proporciona herramientas esenciales para mantener la salud de tu si
 
 *   **Beneficio esperado:**
     Centraliza y facilita el acceso a todas las herramientas de mantenimiento del sistema, permitiéndote realizar tareas de forma organizada y controlada.
+
+---
+
+## 6. Gestión de Logs
+
+Esta opción te permite visualizar los registros de actividad generados por OptiTech System Optimizer.
+
+*   **¿Qué hace?**
+    Muestra el contenido del archivo de log principal de la aplicación, donde se registran todas las acciones, advertencias y errores.
+
+*   **¿Para qué sirve?**
+    Es útil para revisar el historial de operaciones realizadas por la herramienta, diagnosticar posibles problemas o verificar que las acciones se ejecutaron correctamente.
+
+*   **¿Es seguro?**
+    Sí, es **100% seguro**. Esta función solo lee información y no realiza ningún cambio en tu sistema.
