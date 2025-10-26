@@ -105,7 +105,8 @@ class TestSystemOptimizer(unittest.TestCase):
 
     @patch('src.utils.set_registry_value')
     @patch('src.config_manager.load_config')
-    def test_optimize_visual_effects(self, mock_load_config, mock_set_registry_value):
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_visual_effects(self, mock_confirm, mock_load_config, mock_set_registry_value):
         """
         Prueba que la función de optimización de efectos visuales carga la configuración
         y llama a las funciones de modificación del registro correctamente.
@@ -159,7 +160,8 @@ class TestSystemOptimizer(unittest.TestCase):
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
     @patch('src.system_optimizer.config_manager.load_config')
-    def test_optimize_services(self, mock_load_config, mock_set_service, mock_get_status):
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_services(self, mock_confirm, mock_load_config, mock_set_service, mock_get_status):
         """
         Prueba que la función de optimización de servicios carga la configuración,
         comprueba el estado del servicio y llama a la utilidad para deshabilitarlo.
@@ -194,7 +196,8 @@ class TestSystemOptimizer(unittest.TestCase):
 
     @patch('subprocess.run')
     @patch('src.system_optimizer.config_manager.load_config')
-    def test_optimize_power_plan(self, mock_load_config, mock_run):
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_power_plan(self, mock_confirm, mock_load_config, mock_run):
         """
         Prueba que la función para optimizar el plan de energía carga la configuración
         y llama al comando powercfg correctamente.
@@ -215,7 +218,8 @@ class TestSystemOptimizer(unittest.TestCase):
         )
 
     @patch('subprocess.run')
-    def test_optimize_network(self, mock_run):
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_network(self, mock_confirm, mock_run):
         """
         Prueba que la función de optimización de red llama a los comandos correctos.
         """
