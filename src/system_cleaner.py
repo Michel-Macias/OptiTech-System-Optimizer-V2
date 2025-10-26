@@ -166,21 +166,31 @@ def limpiar_copias_sombra():
         print(mensaje_error)
         return False
     try:
-        # El comando vssadmin requiere privilegios de administrador
         comando = ["vssadmin", "delete", "shadows", "/all", "/quiet"]
         
-        # Ejecutar el comando y capturar la salida
-        resultado = subprocess.run(comando, capture_output=True, text=True, check=True, shell=True)
+        # Ejecutar el comando y capturar la salida, sin check=True para manejar la salida de 'no hay elementos'
+        resultado = subprocess.run(comando, capture_output=True, text=True, check=False, shell=True)
         
+        # Verificar si no hay copias de sombra para eliminar (comparación más robusta)
+        if "Ningun elemento cumple los criterios de la consulta." in resultado.stdout.replace('£', 'u') or \
+           "No items found that satisfy the query." in resultado.stdout:
+            mensaje_info = "No se encontraron copias de sombra para eliminar. La papelera de reciclaje ya está vacía o no hay puntos de restauración."
+            logger.info(mensaje_info)
+            print(mensaje_info)
+            return True
+
+        # Si el comando falló por otra razón (código de salida distinto de 0)
+        if resultado.returncode != 0:
+            logger.error(f"Error al ejecutar el comando vssadmin para copias de sombra. Código de salida: {resultado.returncode}")
+            logger.error(f"Salida de error vssadmin (stdout): {resultado.stdout}")
+            logger.error(f"Salida de error vssadmin (stderr): {resultado.stderr}")
+            print(f"Error al eliminar copias de sombra. Mensaje de vssadmin: {resultado.stdout.strip()} {resultado.stderr.strip()}")
+            return False
+
         logger.info("Comando vssadmin ejecutado con éxito.")
         logger.debug(f"Salida vssadmin: {resultado.stdout}")
         print("Eliminación de copias de sombra completada con éxito.")
         return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Error al ejecutar el comando vssadmin para copias de sombra: {e}", exc_info=True)
-        logger.error(f"Salida de error vssadmin: {e.stderr}")
-        print(f"Error al eliminar copias de sombra: {e.stderr}. Mensaje de vssadmin: {e.stderr.strip()}")
-        return False
     except Exception as e:
         logger.error(f"Ocurrió un error inesperado al eliminar copias de sombra: {e}", exc_info=True)
         print(f"Error inesperado al eliminar copias de sombra: {e}")
