@@ -9,7 +9,7 @@ from src import system_maintenance
 class TestSystemMaintenance(unittest.TestCase):
 
     @patch('src.system_maintenance.subprocess.run')
-    @patch('src.system_maintenance.utils.get_backup_dir')
+    @patch('src.system_maintenance.get_backup_dir')
     def test_backup_registry_success(self, mock_get_backup_dir, mock_subprocess_run):
         """Prueba que el backup del registro se ejecuta y devuelve True si tiene éxito."""
         # Configuración del mock

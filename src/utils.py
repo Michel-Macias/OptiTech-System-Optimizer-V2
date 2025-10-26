@@ -5,21 +5,7 @@ import time
 import winreg
 import os
 
-def get_backup_dir():
-    """Asegura que el directorio de backups exista y devuelve su ruta."""
-    try:
-        # Obtener la ruta del directorio raíz del proyecto
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        backup_dir = os.path.join(project_root, 'backups')
-        
-        if not os.path.exists(backup_dir):
-            os.makedirs(backup_dir)
-            print(f"Directorio de backups creado en: {backup_dir}")
-        
-        return backup_dir
-    except Exception as e:
-        print(f"Error al crear el directorio de backups: {e}")
-        return None
+
 
 def set_registry_value(hive, key, value_name, value, value_type):
     """

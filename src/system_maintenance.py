@@ -9,11 +9,27 @@ from src import utils
 APP_LOGGER_NAME = 'OptiTechOptimizer'
 logger = logging.getLogger(APP_LOGGER_NAME)
 
+def get_backup_dir():
+    """Asegura que el directorio de backups exista y devuelve su ruta."""
+    try:
+        # Obtener la ruta del directorio raíz del proyecto
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        backup_dir = os.path.join(project_root, 'backups')
+        
+        if not os.path.exists(backup_dir):
+            os.makedirs(backup_dir)
+            print(f"Directorio de backups creado en: {backup_dir}")
+        
+        return backup_dir
+    except Exception as e:
+        print(f"Error al crear el directorio de backups: {e}")
+        return None
+
 def backup_registry():
     """Crea un backup completo del registro de Windows."""
     logger.info("Iniciando el proceso de backup del registro.")
     
-    backup_dir = utils.get_backup_dir()
+    backup_dir = get_backup_dir()
     if not backup_dir:
         logger.error("No se pudo obtener el directorio de backups. Abortando backup del registro.")
         return False
@@ -235,7 +251,7 @@ def run_maintenance():
             if utils.confirm_operation("¿Está seguro de que desea hacer un backup del registro?"):
                 backup_registry()
         elif choice == '2':
-            backup_files = [f for f in os.listdir(utils.get_backup_dir()) if f.startswith("registry_backup_") and f.endswith(".reg")]
+            backup_files = [f for f in os.listdir(get_backup_dir()) if f.startswith("registry_backup_") and f.endswith(".reg")]
             if not backup_files:
                 print("No se encontraron archivos de backup del registro.")
                 logger.warning("Intento de restauración de registro sin archivos de backup disponibles.")
@@ -248,7 +264,7 @@ def run_maintenance():
             file_choice = input("Seleccione el número del archivo de backup a restaurar: ").strip()
             try:
                 selected_file = backup_files[int(file_choice) - 1]
-                full_path = os.path.join(utils.get_backup_dir(), selected_file)
+                full_path = os.path.join(get_backup_dir(), selected_file)
                 if utils.confirm_operation(f"¿Está seguro de que desea restaurar el registro desde {selected_file}? Esta operación es crítica."):
                     restore_registry(full_path)
             except (ValueError, IndexError):
