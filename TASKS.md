@@ -53,4 +53,4 @@
 - [x] Implementar Seguridad (confirmaciones, puntos de restauración)
 - [x] Asegurar Compatibilidad con Windows 11
 - [x] Implementar Logging robusto
-- [ ] Asegurar Interactividad (menús y confirmaciones)
+- [x] Asegurar Interactividad (menús y confirmaciones)
