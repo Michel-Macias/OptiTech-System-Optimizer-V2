@@ -59,14 +59,23 @@ Esta opción ajusta la apariencia de Windows para que el sistema se sienta más 
 
 ### 4.2. Optimización de Servicios No Esenciales
 
+Este módulo te permite gestionar los servicios de Windows que no son críticos para el funcionamiento diario, pero que pueden consumir recursos del sistema.
+
 *   **¿Qué hace?**
-    Deshabilita ciertos servicios de Windows que no son críticos para el funcionamiento diario de la mayoría de los usuarios (como la telemetría o servicios de fax). 
+    Deshabilita o configura en modo manual ciertos servicios de Windows que no son esenciales para la mayoría de los usuarios (como la telemetría o servicios de fax). La herramienta te presentará una lista de servicios recomendados para optimizar.
+
+*   **Modos de Operación:**
+    *   **Optimización General:** Puedes optar por aplicar todas las optimizaciones recomendadas de una sola vez, con una confirmación inicial.
+    *   **Revisión Individual:** Si prefieres un control más detallado, la herramienta te permitirá revisar cada servicio individualmente. Para cada servicio, se mostrará su descripción, el tipo de inicio recomendado y un **nivel de riesgo** (bajo, medio, alto) asociado a su modificación. Podrás decidir si aplicar la optimización a ese servicio específico.
+
+*   **Opción de Restauración:**
+    Después de realizar una optimización de servicios, el sistema guarda el estado original de los servicios modificados. En el menú principal de optimización, encontrarás una opción para **"Restaurar Servicios a Estado Original"**, que te permitirá revertir los cambios realizados por la última optimización de servicios.
 
 *   **¿Es seguro?**
-    Sí, es una optimización **muy segura**. Los servicios seleccionados son conocidos por ser prescindibles en entornos de oficina típicos. En el improbable caso de que necesites uno de ellos, se pueden reactivar manualmente desde la consola de servicios de Windows.
+    Sí, es una optimización **muy segura**. Los servicios seleccionados son conocidos por ser prescindibles en entornos de oficina típicos. La inclusión de niveles de riesgo y la opción de revisión individual te dan un control total. Además, la función de restauración te permite deshacer los cambios si fuera necesario.
 
 *   **Beneficio esperado:**
-    Liberar una pequeña cantidad de memoria RAM y recursos del procesador, contribuyendo a un sistema ligeramente más ágil.
+    Liberar una cantidad de memoria RAM y recursos del procesador, contribuyendo a un sistema más ágil y mejorando potencialmente la privacidad al deshabilitar servicios de telemetría.
 
 ### 4.3. Activar Plan de Máximo Rendimiento
 
