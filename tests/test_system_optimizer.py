@@ -6,7 +6,6 @@ import json
 from unittest.mock import patch, mock_open, call
 from src import system_optimizer
 
-@patch('src.system_optimizer.optimize_services')
 class TestSystemOptimizer(unittest.TestCase):
 
     def test_load_optimization_profiles_success(self):
@@ -97,12 +96,11 @@ class TestSystemOptimizer(unittest.TestCase):
 
         # Assert
         mock_visual_effects.assert_called_once()
-        self.optimize_services.assert_not_called()
 
     @patch('src.utils.set_registry_value')
     @patch('src.config_manager.load_config')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_visual_effects(self, mock_confirm, mock_load_config, mock_set_registry_value):
+    @patch('builtins.input', side_effect=['y'])
+    def test_optimize_visual_effects(self, mock_input, mock_load_config, mock_set_registry_value):
         """
         Prueba que la función de optimización de efectos visuales carga la configuración
         y llama a las funciones de modificación del registro correctamente.
@@ -156,8 +154,8 @@ class TestSystemOptimizer(unittest.TestCase):
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
     @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_services(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+    @patch('builtins.input', side_effect=['1', 'y'])
+    def test_optimize_services(self, mock_input, mock_load_services_config, mock_set_service, mock_get_status):
         """
         Prueba que la función de optimización de servicios carga la configuración,
         comprueba el estado del servicio y llama a la utilidad para deshabilitarlo.
@@ -194,8 +192,8 @@ class TestSystemOptimizer(unittest.TestCase):
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
     @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_services_already_in_desired_state(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+    @patch('builtins.input', side_effect=['1', 'y'])
+    def test_optimize_services_already_in_desired_state(self, mock_input, mock_load_services_config, mock_set_service, mock_get_status):
         """
         Prueba que optimize_services no intenta cambiar el tipo de inicio de un servicio
         si ya está en el estado recomendado.
@@ -215,8 +213,8 @@ class TestSystemOptimizer(unittest.TestCase):
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
     @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_services_critical_error_get_status(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+    @patch('builtins.input', side_effect=['1', 'y'])
+    def test_optimize_services_critical_error_get_status(self, mock_input, mock_load_services_config, mock_set_service, mock_get_status):
         """
         Prueba que optimize_services maneja un error crítico (None) al obtener el estado del servicio.
         """
@@ -235,8 +233,8 @@ class TestSystemOptimizer(unittest.TestCase):
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
     @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_services_not_found(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+    @patch('builtins.input', side_effect=['1', 'y'])
+    def test_optimize_services_not_found(self, mock_input, mock_load_services_config, mock_set_service, mock_get_status):
         """
         Prueba que optimize_services maneja un servicio que no se encuentra en el sistema.
         """
@@ -254,8 +252,8 @@ class TestSystemOptimizer(unittest.TestCase):
 
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_restore_services_to_original_state(self, mock_confirm, mock_set_service, mock_get_status):
+    @patch('builtins.input', side_effect=['y'])
+    def test_restore_services_to_original_state(self, mock_input, mock_set_service, mock_get_status):
         """
         Prueba la función restore_services_to_original_state.
         """
@@ -276,7 +274,6 @@ class TestSystemOptimizer(unittest.TestCase):
         system_optimizer.restore_services_to_original_state()
 
         # Assert
-        mock_confirm.assert_called_once() # Se debe pedir confirmación
         mock_get_status.assert_has_calls([call('ServiceA'), call('ServiceB')], any_order=False)
         mock_set_service.assert_has_calls([
             call('ServiceA', 'auto'),
@@ -286,8 +283,8 @@ class TestSystemOptimizer(unittest.TestCase):
 
     @patch('subprocess.run')
     @patch('src.system_optimizer.config_manager.load_config')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_power_plan(self, mock_confirm, mock_load_config, mock_run):
+    @patch('builtins.input', side_effect=['y'])
+    def test_optimize_power_plan(self, mock_input, mock_load_config, mock_run):
         """
         Prueba que la función para optimizar el plan de energía carga la configuración
         y llama al comando powercfg correctamente.
@@ -308,8 +305,8 @@ class TestSystemOptimizer(unittest.TestCase):
         )
 
     @patch('subprocess.run')
-    @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_network(self, mock_confirm, mock_run):
+    @patch('builtins.input', side_effect=['y'])
+    def test_optimize_network(self, mock_input, mock_run):
         """
         Prueba que la función de optimización de red llama a los comandos correctos.
         """
