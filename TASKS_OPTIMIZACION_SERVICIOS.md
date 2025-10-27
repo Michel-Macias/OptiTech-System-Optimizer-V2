@@ -32,7 +32,7 @@ Este checklist detalla los pasos para implementar y mejorar la funcionalidad de 
 
 ## Fase 3: Interfaz de Usuario y Experiencia
 
-- [ ] **8. Actualizar `main.py`:**
+- [x] **8. Actualizar `main.py`:**
     - Modificar la interacción con el usuario para el módulo de optimización de servicios.
     - Mostrar la descripción y el nivel de riesgo de cada servicio antes de pedir confirmación.
     - Ofrecer la opción de confirmar la optimización por servicio o una confirmación general.

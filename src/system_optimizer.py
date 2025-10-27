@@ -183,12 +183,30 @@ def optimize_visual_effects():
 
 def optimize_services():
     """Orquesta la desactivación de servicios no esenciales de Windows."""
-    if not utils.confirm_operation("¿Está seguro de que desea optimizar los servicios? Esto desactivará servicios que pueden no ser necesarios."):
+    utils.show_header("Módulo de Optimización de Servicios")
+    logger.info("Iniciando la optimización de servicios.")
+
+    print("\n¿Cómo desea proceder con la optimización de servicios?")
+    print("  1. Optimizar todos los servicios recomendados (confirmación general)")
+    print("  2. Revisar y optimizar cada servicio individualmente")
+    print("  3. Cancelar y volver al menú anterior")
+
+    mode_choice = input("Seleccione una opción: ").strip()
+
+    if mode_choice == '3':
         logger.info("Operación de optimización de servicios cancelada por el usuario.")
         return
 
-    utils.show_header("Módulo de Optimización de Servicios")
-    logger.info("Iniciando la optimización de servicios.")
+    confirm_all = False
+    if mode_choice == '1':
+        if not utils.confirm_operation("¿Está seguro de que desea optimizar TODOS los servicios recomendados sin revisión individual?"):
+            logger.info("Confirmación general de optimización de servicios cancelada por el usuario.")
+            return
+        confirm_all = True
+    elif mode_choice != '2':
+        print("Opción no válida. Cancelando optimización de servicios.")
+        logger.warning(f"Opción de modo de optimización de servicios no válida seleccionada: {mode_choice}")
+        return
 
     global _original_service_states
     _original_service_states = [] # Limpiar la lista al inicio de cada ejecución
@@ -211,6 +229,11 @@ def optimize_services():
         print(f"Descripción: {description}")
         print(f"Tipo de inicio recomendado: {recommended_startup_type.capitalize()}")
         print(f"Nivel de riesgo: {risk_level.capitalize()}")
+
+        if not confirm_all:
+            if not utils.confirm_operation(f"¿Desea optimizar el servicio '{service_name}' a '{recommended_startup_type.capitalize()}'?"):
+                logger.info(f"Optimización del servicio '{service_name}' cancelada por el usuario.")
+                continue
 
         status = get_service_status(service_name)
 
