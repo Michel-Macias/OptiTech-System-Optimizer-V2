@@ -6,6 +6,7 @@ import json
 from unittest.mock import patch, mock_open, call
 from src import system_optimizer
 
+@patch('src.system_optimizer.optimize_services')
 class TestSystemOptimizer(unittest.TestCase):
 
     def test_load_optimization_profiles_success(self):
@@ -96,6 +97,7 @@ class TestSystemOptimizer(unittest.TestCase):
 
         # Assert
         mock_visual_effects.assert_called_once()
+        self.optimize_services.assert_not_called()
 
     @patch('src.utils.set_registry_value')
     @patch('src.config_manager.load_config')
