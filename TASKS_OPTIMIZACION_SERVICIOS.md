@@ -42,7 +42,7 @@ Este checklist detalla los pasos para implementar y mejorar la funcionalidad de 
 
 - [x] **9. Actualizar `README.md` y `TASKS.md`:**
     - Reflejar el progreso y la finalización de esta tarea.
-- [ ] **10. Commit de los cambios:**
+- [x] **10. Commit de los cambios:**
     - Realizar un commit con un mensaje claro y en español.
-- [ ] **11. Crear Pull Request (si aplica):**
+- [x] **11. Crear Pull Request (si aplica):**
     - Abrir una PR para fusionar la rama de funcionalidad a `main`.
