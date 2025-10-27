@@ -87,21 +87,21 @@ class TestSystemOptimizer(unittest.TestCase):
 
     @patch('src.system_optimizer.optimize_network')
     @patch('src.system_optimizer.optimize_power_plan')
-    @patch('src.system_optimizer.optimize_services')
     @patch('src.system_optimizer.optimize_visual_effects')
     @patch('builtins.input', side_effect=['1', '6'])
-    def test_run_optimizer_menu_selection(self, mock_input, mock_visual_effects, mock_services, mock_power_plan, mock_network):
+    def test_run_optimizer_menu_selection(self, mock_input, mock_visual_effects, mock_power_plan, mock_network):
         """
         Prueba que el menú de Run-Optimizer llama a la función correcta según la selección del usuario.
         """
-        # Act
-        system_optimizer.run_optimizer()
+        with patch('src.system_optimizer.optimize_services') as mock_services:
+            # Act
+            system_optimizer.run_optimizer()
 
-        # Assert
-        mock_visual_effects.assert_called_once()
-        mock_services.assert_not_called()
-        mock_power_plan.assert_not_called()
-        mock_network.assert_not_called()
+            # Assert
+            mock_visual_effects.assert_called_once()
+            mock_services.assert_not_called()
+            mock_power_plan.assert_not_called()
+            mock_network.assert_not_called()
 
     @patch('src.utils.set_registry_value')
     @patch('src.config_manager.load_config')
