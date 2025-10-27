@@ -29,7 +29,7 @@
 
 ## 5. Optimización del Sistema
 - [x] Implementar Optimize-VisualEffects (Ajusta efectos visuales)
-- [x] Implementar Optimize-Services (Desactiva servicios no críticos)
+- [x] Implementar Optimize-Services (Desactiva servicios no críticos, con configuración externa, reversibilidad y UX mejorada)
 - [x] Implementar Optimize-PowerPlan (Activa plan de energía de alto rendimiento)
 - [x] Implementar Optimize-Network (Reinicia configuración de red)
 - [x] Implementar Run-Optimizer (Permite optimización rápida o completa)

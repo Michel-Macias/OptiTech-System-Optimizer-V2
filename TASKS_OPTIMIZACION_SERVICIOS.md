@@ -40,7 +40,7 @@ Este checklist detalla los pasos para implementar y mejorar la funcionalidad de 
 
 ## Fase 4: Documentación y Finalización
 
-- [ ] **9. Actualizar `README.md` y `TASKS.md`:**
+- [x] **9. Actualizar `README.md` y `TASKS.md`:**
     - Reflejar el progreso y la finalización de esta tarea.
 - [ ] **10. Commit de los cambios:**
     - Realizar un commit con un mensaje claro y en español.

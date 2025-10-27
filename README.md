@@ -52,7 +52,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-Todo el desarrollo de funcionalidades principales está completo. El proyecto está listo para la fase de empaquetado y distribución.
+El desarrollo de las funcionalidades principales está completo. El módulo de Optimización de Servicios ha sido mejorado significativamente, incluyendo configuración externa, reversibilidad y una interacción de usuario más granular. El proyecto está listo para la fase de empaquetado y distribución.
 
 ## Cómo Contribuir
 
