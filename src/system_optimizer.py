@@ -10,6 +10,8 @@ from src import config_manager
 APP_LOGGER_NAME = 'OptiTechOptimizer'
 logger = logging.getLogger(APP_LOGGER_NAME)
 
+_original_service_states = [] # Lista global para almacenar los estados originales de los servicios
+
 def run_optimizer():
     """Muestra un menú interactivo para que el usuario elija las optimizaciones a aplicar."""
     utils.show_header("Módulo de Optimización del Sistema")
@@ -21,7 +23,8 @@ def run_optimizer():
         print("  2. Optimizar Servicios No Esenciales")
         print("  3. Activar Plan de Máximo Rendimiento")
         print("  4. Optimizar y Reiniciar Red")
-        print("  5. Volver al Menú Principal")
+        print("  5. Restaurar Servicios a Estado Original")
+        print("  6. Volver al Menú Principal")
 
         choice = input("Seleccione una opción: ").strip()
 
@@ -34,6 +37,8 @@ def run_optimizer():
         elif choice == '4':
             optimize_network()
         elif choice == '5':
+            restore_services_to_original_state()
+        elif choice == '6':
             print("Volviendo al menú principal...")
             logger.info("Saliendo del módulo de optimización.")
             break
@@ -185,38 +190,123 @@ def optimize_services():
     utils.show_header("Módulo de Optimización de Servicios")
     logger.info("Iniciando la optimización de servicios.")
 
-    config = config_manager.load_config('services_to_optimize.json')
-    services_to_disable = config.get('services', [])
+    global _original_service_states
+    _original_service_states = [] # Limpiar la lista al inicio de cada ejecución
 
-    if not services_to_disable:
-        print("No se encontraron configuraciones para la optimización de servicios.")
-        logger.warning("El archivo 'services_to_optimize.json' no se encontró o está vacío.")
+    services_to_optimize = config_manager.config_manager_instance.load_services_to_optimize_config()
+
+    if not services_to_optimize:
+        print("No se encontraron configuraciones para la optimización de servicios. Asegúrese de que 'services_to_optimize.json' esté configurado correctamente.")
+        logger.warning("El archivo 'services_to_optimize.json' no se encontró o está vacío/mal formado.")
         return
 
     changes_applied = 0
-    for i, service in enumerate(services_to_disable, 1):
-        service_name = service.get('name', 'SinNombre')
-        description = service.get('description', 'Sin descripción')
-        print(f"\n--- {i}. Deshabilitando: {service_name} ---")
+    for i, service_config in enumerate(services_to_optimize, 1):
+        service_name = service_config.get('name', 'SinNombre')
+        description = service_config.get('description', 'Sin descripción')
+        recommended_startup_type = service_config.get('recommended_startup_type', 'disabled')
+        risk_level = service_config.get('risk_level', 'desconocido')
+
+        print(f"\n--- {i}. Procesando servicio: {service_name} ---")
         print(f"Descripción: {description}")
+        print(f"Tipo de inicio recomendado: {recommended_startup_type.capitalize()}")
+        print(f"Nivel de riesgo: {risk_level.capitalize()}")
 
         status = get_service_status(service_name)
 
-        if status and status.get('startup', '').upper() == 'DISABLED':
-            print(f"El servicio '{service_name}' ya se encuentra deshabilitado.")
+        if status is None: # Error crítico al obtener el estado
+            print(f"Error crítico: No se pudo obtener el estado del servicio '{service_name}'. Saltando.")
+            logger.error(f"Error crítico al obtener el estado del servicio '{service_name}'.")
+            continue
+
+        current_startup = status.get('startup', '').lower()
+        current_state = status.get('state', '').lower()
+
+        if current_startup == 'not_found':
+            print(f"Advertencia: El servicio '{service_name}' no se encontró en el sistema. Saltando.")
+            logger.warning(f"El servicio '{service_name}' no se encontró en el sistema.")
+            continue
+
+        if current_startup == recommended_startup_type.lower():
+            print(f"El servicio '{service_name}' ya está configurado como '{recommended_startup_type}'.")
+            logger.info(f"El servicio '{service_name}' ya está en el estado deseado: '{recommended_startup_type}'.")
             continue
         
-        success = set_service_startup_type(service_name, 'disabled')
+        print(f"Estado actual: Inicio: {current_startup.capitalize()}, Estado: {current_state.capitalize()}")
+        logger.info(f"Cambiando el tipo de inicio del servicio '{service_name}' de '{current_startup}' a '{recommended_startup_type}'.")
+
+        # Almacenar el estado original antes de modificar
+        _original_service_states.append({
+            'name': service_name,
+            'original_startup_type': current_startup
+        })
+
+        success = set_service_startup_type(service_name, recommended_startup_type)
 
         if success:
-            print(f"Éxito: El servicio '{service_name}' ha sido configurado como deshabilitado.")
+            print(f"Éxito: El servicio '{service_name}' ha sido configurado como '{recommended_startup_type}'.")
             changes_applied += 1
         else:
-            print(f"Error al deshabilitar el servicio '{service_name}'.")
-            logger.error(f"Fallo al cambiar el tipo de inicio para el servicio '{service_name}'.")
+            print(f"Error al configurar el servicio '{service_name}' a '{recommended_startup_type}'.")
+            logger.error(f"Fallo al cambiar el tipo de inicio para el servicio '{service_name}' a '{recommended_startup_type}'.")
 
-    print(f"\nOptimización de servicios completada. Se intentaron {changes_applied} cambios.")
-    logger.info(f"Finalizada la optimización de servicios. Cambios intentados: {changes_applied}")
+    print(f"\nOptimización de servicios completada. Se aplicaron {changes_applied} cambios.")
+    logger.info(f"Finalizada la optimización de servicios. Cambios aplicados: {changes_applied}")
+
+def restore_services_to_original_state():
+    """Restaura los servicios a su tipo de inicio original antes de la última optimización."""
+    global _original_service_states
+
+    if not _original_service_states:
+        print("No hay estados de servicios originales guardados para restaurar.")
+        logger.info("Intento de restaurar servicios sin estados originales guardados.")
+        return
+
+    if not utils.confirm_operation("¿Está seguro de que desea restaurar los servicios a su estado original?"):
+        logger.info("Operación de restauración de servicios cancelada por el usuario.")
+        return
+
+    utils.show_header("Módulo de Restauración de Servicios")
+    logger.info("Iniciando la restauración de servicios.")
+
+    restored_count = 0
+    for i, service_data in enumerate(_original_service_states, 1):
+        service_name = service_data['name']
+        original_startup_type = service_data['original_startup_type']
+
+        print(f"\n--- {i}. Restaurando servicio: {service_name} ---")
+        print(f"Restaurando a tipo de inicio: {original_startup_type.capitalize()}")
+
+        status = get_service_status(service_name)
+        if status is None:
+            print(f"Error crítico: No se pudo obtener el estado del servicio '{service_name}'. Saltando restauración.")
+            logger.error(f"Error crítico al obtener el estado del servicio '{service_name}' durante la restauración.")
+            continue
+
+        current_startup = status.get('startup', '').lower()
+
+        if current_startup == 'not_found':
+            print(f"Advertencia: El servicio '{service_name}' no se encontró en el sistema. No se puede restaurar.")
+            logger.warning(f"El servicio '{service_name}' no se encontró en el sistema durante la restauración.")
+            continue
+
+        if current_startup == original_startup_type.lower():
+            print(f"El servicio '{service_name}' ya está en su estado original '{original_startup_type}'.")
+            logger.info(f"El servicio '{service_name}' ya está en su estado original '{original_startup_type}'.")
+            continue
+
+        success = set_service_startup_type(service_name, original_startup_type)
+
+        if success:
+            print(f"Éxito: El servicio '{service_name}' ha sido restaurado a '{original_startup_type}'.")
+            restored_count += 1
+        else:
+            print(f"Error al restaurar el servicio '{service_name}' a '{original_startup_type}'.")
+            logger.error(f"Fallo al restaurar el tipo de inicio para el servicio '{service_name}' a '{original_startup_type}'.")
+
+    print(f"\nRestauración de servicios completada. Se restauraron {restored_count} servicios.")
+    logger.info(f"Finalizada la restauración de servicios. Servicios restaurados: {restored_count}")
+    _original_service_states = [] # Limpiar la lista después de la restauración
 
 def optimize_power_plan():
     """Activa el plan de energía de alto rendimiento de Windows."""

@@ -89,7 +89,7 @@ class TestSystemOptimizer(unittest.TestCase):
     @patch('src.system_optimizer.optimize_power_plan')
     @patch('src.system_optimizer.optimize_services')
     @patch('src.system_optimizer.optimize_visual_effects')
-    @patch('builtins.input', side_effect=['1', '5'])
+    @patch('builtins.input', side_effect=['1', '6'])
     def test_run_optimizer_menu_selection(self, mock_input, mock_visual_effects, mock_services, mock_power_plan, mock_network):
         """
         Prueba que el menú de Run-Optimizer llama a la función correcta según la selección del usuario.
@@ -159,40 +159,134 @@ class TestSystemOptimizer(unittest.TestCase):
 
     @patch('src.system_optimizer.get_service_status')
     @patch('src.system_optimizer.set_service_startup_type')
-    @patch('src.system_optimizer.config_manager.load_config')
+    @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
     @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_services(self, mock_confirm, mock_load_config, mock_set_service, mock_get_status):
+    def test_optimize_services(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
         """
         Prueba que la función de optimización de servicios carga la configuración,
         comprueba el estado del servicio y llama a la utilidad para deshabilitarlo.
         """
         # Arrange: Configuración simulada de servicios y estado
-        mock_services_config = {
-            "services": [
-                {"name": "TestService1", "description": "A test service"},
-                {"name": "TestService2", "description": "Another test service"}
-            ]
-        }
-        mock_load_config.return_value = mock_services_config
+        mock_services_config = [
+            {"name": "TestService1", "description": "A test service", "recommended_startup_type": "disabled", "risk_level": "bajo"},
+            {"name": "TestService2", "description": "Another test service", "recommended_startup_type": "manual", "risk_level": "medio"}
+        ]
+        mock_load_services_config.return_value = mock_services_config
         mock_set_service.return_value = True  # Simula éxito
-        mock_get_status.return_value = {'startup': 'AUTO_START'} # Simula que no está deshabilitado
+        mock_get_status.side_effect = [
+            {'startup': 'auto', 'state': 'running'}, # TestService1 no está deshabilitado
+            {'startup': 'auto', 'state': 'running'}  # TestService2 no está manual
+        ]
 
         # Act: Llama a la función que estamos probando
         system_optimizer.optimize_services()
 
         # Assert: Verifica las llamadas a los mocks
-        mock_load_config.assert_called_once_with("services_to_optimize.json")
+        mock_load_services_config.assert_called_once() # No necesita argumentos ya que es un método de instancia
 
         # Verifica que se comprueba el estado de cada servicio
         status_calls = [call("TestService1"), call("TestService2")]
-        mock_get_status.assert_has_calls(status_calls, any_order=True)
+        mock_get_status.assert_has_calls(status_calls, any_order=False)
 
-        # Verifica que se intenta deshabilitar cada servicio
+        # Verifica que se intenta deshabilitar cada servicio con su tipo recomendado
         set_service_calls = [
             call("TestService1", "disabled"),
-            call("TestService2", "disabled")
+            call("TestService2", "manual")
         ]
-        mock_set_service.assert_has_calls(set_service_calls, any_order=True)
+        mock_set_service.assert_has_calls(set_service_calls, any_order=False)
+
+    @patch('src.system_optimizer.get_service_status')
+    @patch('src.system_optimizer.set_service_startup_type')
+    @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_services_already_in_desired_state(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+        """
+        Prueba que optimize_services no intenta cambiar el tipo de inicio de un servicio
+        si ya está en el estado recomendado.
+        """
+        mock_services_config = [
+            {"name": "TestService1", "description": "A test service", "recommended_startup_type": "disabled", "risk_level": "bajo"}
+        ]
+        mock_load_services_config.return_value = mock_services_config
+        mock_get_status.return_value = {'startup': 'disabled', 'state': 'stopped'} # Ya deshabilitado
+
+        system_optimizer.optimize_services()
+
+        mock_load_services_config.assert_called_once()
+        mock_get_status.assert_called_once_with("TestService1")
+        mock_set_service.assert_not_called() # No debería llamarse si ya está en el estado deseado
+
+    @patch('src.system_optimizer.get_service_status')
+    @patch('src.system_optimizer.set_service_startup_type')
+    @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_services_critical_error_get_status(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+        """
+        Prueba que optimize_services maneja un error crítico (None) al obtener el estado del servicio.
+        """
+        mock_services_config = [
+            {"name": "TestService1", "description": "A test service", "recommended_startup_type": "disabled", "risk_level": "bajo"}
+        ]
+        mock_load_services_config.return_value = mock_services_config
+        mock_get_status.return_value = None # Simula un error crítico
+
+        system_optimizer.optimize_services()
+
+        mock_load_services_config.assert_called_once()
+        mock_get_status.assert_called_once_with("TestService1")
+        mock_set_service.assert_not_called() # No debería intentar cambiar el servicio si hay un error crítico
+
+    @patch('src.system_optimizer.get_service_status')
+    @patch('src.system_optimizer.set_service_startup_type')
+    @patch('src.config_manager.ConfigManager.load_services_to_optimize_config')
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_optimize_services_not_found(self, mock_confirm, mock_load_services_config, mock_set_service, mock_get_status):
+        """
+        Prueba que optimize_services maneja un servicio que no se encuentra en el sistema.
+        """
+        mock_services_config = [
+            {"name": "TestService1", "description": "A test service", "recommended_startup_type": "disabled", "risk_level": "bajo"}
+        ]
+        mock_load_services_config.return_value = mock_services_config
+        mock_get_status.return_value = {'startup': 'not_found', 'state': 'not_found'} # Simula servicio no encontrado
+
+        system_optimizer.optimize_services()
+
+        mock_load_services_config.assert_called_once()
+        mock_get_status.assert_called_once_with("TestService1")
+        mock_set_service.assert_not_called() # No debería intentar cambiar el servicio si no se encuentra
+
+    @patch('src.system_optimizer.get_service_status')
+    @patch('src.system_optimizer.set_service_startup_type')
+    @patch('src.utils.confirm_operation', return_value=True)
+    def test_restore_services_to_original_state(self, mock_confirm, mock_set_service, mock_get_status):
+        """
+        Prueba la función restore_services_to_original_state.
+        """
+        # Arrange: Simular que se optimizaron algunos servicios y se guardaron sus estados originales
+        system_optimizer._original_service_states = [
+            {'name': 'ServiceA', 'original_startup_type': 'auto'},
+            {'name': 'ServiceB', 'original_startup_type': 'manual'}
+        ]
+
+        # Simular que los servicios están en un estado diferente al original para que se intente el cambio
+        mock_get_status.side_effect = [
+            {'startup': 'disabled', 'state': 'stopped'}, # ServiceA
+            {'startup': 'disabled', 'state': 'stopped'}  # ServiceB
+        ]
+        mock_set_service.return_value = True # Simular éxito en el cambio
+
+        # Act
+        system_optimizer.restore_services_to_original_state()
+
+        # Assert
+        mock_confirm.assert_called_once() # Se debe pedir confirmación
+        mock_get_status.assert_has_calls([call('ServiceA'), call('ServiceB')], any_order=False)
+        mock_set_service.assert_has_calls([
+            call('ServiceA', 'auto'),
+            call('ServiceB', 'manual')
+        ], any_order=False)
+        self.assertEqual(system_optimizer._original_service_states, []) # La lista debe limpiarse al final
 
     @patch('subprocess.run')
     @patch('src.system_optimizer.config_manager.load_config')

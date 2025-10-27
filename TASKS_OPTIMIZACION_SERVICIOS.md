@@ -15,17 +15,17 @@ Este checklist detalla los pasos para implementar y mejorar la funcionalidad de 
 
 ## Fase 2: Refactorización y Lógica del Módulo
 
-- [ ] **4. Refactorizar `system_optimizer.py` (o módulo de servicios):**
+- [x] **4. Refactorizar `system_optimizer.py` (o módulo de servicios):**
     - Modificar la función de optimización de servicios para que lea la lista de servicios y sus configuraciones desde `config_manager`.
     - Implementar la lógica para iterar sobre los servicios y aplicar los cambios.
-- [ ] **5. Mejorar el manejo de errores y logging:**
+- [x] **5. Mejorar el manejo de errores y logging:**
     - Cuando un servicio no se encuentre, registrar un mensaje de advertencia claro y no intentar modificarlo.
     - Registrar el estado original del servicio antes de cualquier cambio.
     - Registrar el resultado de la operación (éxito/fallo y el cambio realizado).
-- [ ] **6. Implementar la reversibilidad (opcional pero recomendado):**
+- [x] **6. Implementar la reversibilidad (opcional pero recomendado):**
     - Antes de modificar un servicio, guardar su estado original (tipo de inicio).
     - Añadir una función para restaurar los servicios a su estado original.
-- [ ] **7. Crear pruebas unitarias para el módulo de optimización de servicios:**
+- [x] **7. Crear pruebas unitarias para el módulo de optimización de servicios:**
     - Mockear las interacciones con el sistema operativo para simular el cambio de estado de los servicios.
     - Verificar que la lógica de lectura de configuración y aplicación de cambios funciona correctamente.
     - Probar el manejo de servicios no encontrados.
