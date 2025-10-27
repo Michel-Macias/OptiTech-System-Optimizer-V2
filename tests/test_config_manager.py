@@ -74,6 +74,19 @@ class TestConfigManager(unittest.TestCase):
         self.assertIsNotNone(self.config_manager, "config_manager module not found")
         self.assertEqual(self.config_manager.get_default_encoding(), 'utf-8')
 
+    @patch('src.config_manager.load_config')
+    def test_load_services_to_optimize_config(self, mock_load_config):
+        expected_services_config = [
+            {"name": "TestService1", "description": "Desc1", "recommended_startup_type": "disabled", "risk_level": "bajo"},
+            {"name": "TestService2", "description": "Desc2", "recommended_startup_type": "manual", "risk_level": "medio"}
+        ]
+        mock_load_config.return_value = expected_services_config
+
+        loaded_config = self.config_manager.config_manager_instance.load_services_to_optimize_config()
+
+        mock_load_config.assert_called_once_with('services_to_optimize.json')
+        self.assertEqual(loaded_config, expected_services_config)
+
 if __name__ == '__main__':
     unittest.main()
 

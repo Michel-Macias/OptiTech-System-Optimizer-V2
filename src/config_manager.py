@@ -71,6 +71,9 @@ class ConfigManager:
     def get_default_encoding(self):
         return DEFAULT_ENCODING
 
+    def load_services_to_optimize_config(self):
+        return load_config('services_to_optimize.json')
+
 # Instantiate ConfigManager once to ensure directories are created when module is imported
 config_manager_instance = ConfigManager()
 

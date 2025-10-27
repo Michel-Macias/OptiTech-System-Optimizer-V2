@@ -1,12 +1,56 @@
-{
-  "services": [
+[
     {
-      "name": "DiagTrack",
-      "description": "Connected User Experiences and Telemetry. Disabling can improve privacy."
+        "name": "DiagTrack",
+        "description": "Connected User Experiences and Telemetry. Disabling can improve privacy.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "bajo"
     },
     {
-      "name": "dmwappushservice",
-      "description": "Device Management Wireless Application Protocol (WAP) Push message Routing Service. Often not required."
+        "name": "dmwappushservice",
+        "description": "Device Management Wireless Application Protocol (WAP) Push message Routing Service. Often not required.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "bajo"
+    },
+    {
+        "name": "Fax",
+        "description": "Permite enviar y recibir faxes. Deshabilitar si no se utiliza.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "bajo"
+    },
+    {
+        "name": "Spooler",
+        "description": "Administra los trabajos de impresión. Deshabilitar si no se utiliza impresora.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "medio"
+    },
+    {
+        "name": "WMPNetworkSvc",
+        "description": "Servicio de uso compartido de red de Windows Media Player. Deshabilitar si no se comparte contenido multimedia.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "bajo"
+    },
+    {
+        "name": "RemoteRegistry",
+        "description": "Permite a usuarios remotos modificar la configuración del registro en este equipo. Deshabilitar por seguridad si no es necesario.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "alto"
+    },
+    {
+        "name": "TabletInputService",
+        "description": "Habilita la funcionalidad de lápiz y entrada táctil. Deshabilitar si no se usa tableta o pantalla táctil.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "bajo"
+    },
+    {
+        "name": "SysMain",
+        "description": "Mantiene y mejora el rendimiento del sistema a lo largo del tiempo. En SSDs modernos, puede ser deshabilitado.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "medio"
+    },
+    {
+        "name": "DoSvc",
+        "description": "Optimización de entrega. Permite descargas de Windows Update más rápidas. Deshabilitar si el ancho de banda es limitado o se prefiere control manual.",
+        "recommended_startup_type": "disabled",
+        "risk_level": "medio"
     }
-  ]
-}
+]
