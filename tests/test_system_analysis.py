@@ -79,8 +79,8 @@ class TestSystemAnalysis(unittest.TestCase):
         self.assertEqual(specs['disk_info'][0]['total_size'], '500.00 GB')
         self.assertEqual(specs['disk_info'][0]['percentage'], '40.0%')
 
-    @patch('platform.system', side_effect=Exception("Test Error"))
-    def test_get_system_specs_failure(self, mock_system):
+    @patch('platform.system', MagicMock(side_effect=Exception("Test Error")))
+    def test_get_system_specs_failure(self):
         """Prueba el fallo durante la recopilación de especificaciones."""
         specs = system_analysis.get_system_specs()
         self.assertIsNone(specs)
