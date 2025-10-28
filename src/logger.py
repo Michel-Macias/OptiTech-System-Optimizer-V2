@@ -20,7 +20,7 @@ def setup_logging(log_file=None, console_level=logging.INFO, file_level=logging.
     """
     # Ensure config_manager is initialized and paths are available
     if log_file is None:
-        log_file = os.path.join(config_manager.get_log_path(), "app.log")
+        log_file = os.path.join(config_manager.get_log_path(), "OptiTech_System_Optimizer.log")
 
     # Create log directory if it doesn't exist
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
