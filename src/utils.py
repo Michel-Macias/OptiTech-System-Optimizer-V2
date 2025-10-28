@@ -4,6 +4,7 @@ import sys
 import time
 import winreg
 import os
+import subprocess
 
 
 
@@ -112,5 +113,95 @@ def show_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length
     if iteration == total:
         sys.stdout.write('\n')
         sys.stdout.flush()
+
+
+def get_service_status(service_name):
+    """
+    Obtiene el estado y el tipo de inicio de un servicio de Windows de forma robusta.
+    Es compatible con sistemas en inglés y español.
+
+    Args:
+        service_name (str): El nombre del servicio.
+
+    Returns:
+        dict: Un diccionario con 'state' y 'startup', o None si el servicio no existe o hay un error.
+    """
+    status_info = {'state': 'UNKNOWN', 'startup': 'UNKNOWN'}
+
+    try:
+        # 1. Verificar existencia y obtener START_TYPE con 'sc qc'
+        qc_cmd = ["sc.exe", "qc", service_name]
+        qc_result = subprocess.run(qc_cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', check=False)
+
+        if qc_result.returncode != 0:
+            return {'state': 'NOT_FOUND', 'startup': 'NOT_FOUND'}
+
+        for line in qc_result.stdout.splitlines():
+            if "START_TYPE" in line or "TIPO_INICIO" in line:
+                startup_raw = line.split(':')[1].strip()
+                if "AUTO_START" in startup_raw or "AUTOMATICO" in startup_raw:
+                    status_info['startup'] = 'AUTO_START'
+                elif "DEMAND_START" in startup_raw or "A_PETICION" in startup_raw:
+                    status_info['startup'] = 'DEMAND_START'
+                elif "DISABLED" in startup_raw or "DESHABILITADO" in startup_raw:
+                    status_info['startup'] = 'DISABLED'
+                break
+        
+        # 2. Obtener el estado (STATE) con 'sc query'
+        query_cmd = ["sc.exe", "query", service_name]
+        query_result = subprocess.run(query_cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', check=False)
+
+        if query_result.returncode == 0:
+            for line in query_result.stdout.splitlines():
+                if "STATE" in line or "ESTADO" in line:
+                    state_raw = line.split(':')[1].strip()
+                    if "RUNNING" in state_raw or "EN_EJECUCION" in state_raw:
+                        status_info['state'] = 'RUNNING'
+                    elif "STOPPED" in state_raw or "DETENIDO" in state_raw:
+                        status_info['state'] = 'STOPPED'
+                    break
+        else:
+            if status_info['startup'] == 'DISABLED':
+                status_info['state'] = 'STOPPED'
+
+    except FileNotFoundError:
+        return None
+    except Exception:
+        return None
+
+    return status_info
+
+def set_service_startup_type(service_name, startup_type):
+    """
+    Cambia el tipo de inicio de un servicio de Windows.
+
+    Args:
+        service_name (str): El nombre del servicio.
+        startup_type (str): El nuevo tipo de inicio ('auto', 'demand', 'disabled').
+
+    Returns:
+        bool: True si la operación fue exitosa, False en caso contrario.
+    """
+
+    valid_startup_types = {
+        "automatic": "auto",
+        "manual": "demand",
+        "disabled": "disabled"
+    }
+    sc_startup_type = valid_startup_types.get(startup_type, startup_type)
+
+    try:
+        cmd = ["sc.exe", "config", service_name, "start=", sc_startup_type]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True, encoding='utf-8', errors='replace')
+        return True
+    except FileNotFoundError:
+        # log_manager.error("El comando 'sc.exe' no se encontró.")
+        return False
+    except subprocess.CalledProcessError:
+        # log_manager.error(f"Error al cambiar tipo de inicio de '{service_name}': {e.stderr}")
+        return False
+    except Exception:
+        # log_manager.error(f"Error inesperado al cambiar tipo de inicio de '{service_name}': {e}", exc_info=True)
+        return False
 
 

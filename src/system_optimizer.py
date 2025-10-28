@@ -61,82 +61,6 @@ def load_optimization_profiles(file_path=CONFIG_FILE_PATH):
         logger.error(f"Error inesperado al cargar los perfiles de optimización: {e}", exc_info=True)
         return []
 
-def get_service_status(service_name):
-    """Obtiene el estado y el tipo de inicio de un servicio de Windows."""
-    logger.info(f"Obteniendo estado para el servicio: {service_name}")
-    status_info = {'state': 'NOT_FOUND', 'startup': 'NOT_FOUND'}
-
-    try:
-        # Obtener el estado (STATE)
-        query_cmd = ["sc.exe", "query", service_name]
-        query_result = subprocess.run(query_cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
-
-        if query_result.returncode == 0:
-            for line in query_result.stdout.splitlines():
-                if "STATE" in line:
-                    # La línea es como '        STATE              : 4  RUNNING'
-                    status_info['state'] = line.split(':')[1].strip().split()[-1]
-                    break
-        else:
-            logger.warning(f"El comando 'sc query' falló para el servicio {service_name}. Salida: {query_result.stderr}")
-            # Si query falla, es probable que el servicio no exista.
-            return status_info
-
-        # Obtener el tipo de inicio (START_TYPE)
-        qc_cmd = ["sc.exe", "qc", service_name]
-        qc_result = subprocess.run(qc_cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
-
-        if qc_result.returncode == 0:
-            for line in qc_result.stdout.splitlines():
-                if "START_TYPE" in line:
-                    # La línea es como '        START_TYPE         : 2   AUTO_START'
-                    status_info['startup'] = line.split(':')[1].strip().split()[-1]
-                    break
-        else:
-            logger.warning(f"El comando 'sc qc' falló para el servicio {service_name}. Salida: {qc_result.stderr}")
-
-    except FileNotFoundError:
-        logger.error("El comando 'sc.exe' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        return None # Error crítico, no podemos continuar
-    except Exception as e:
-        logger.error(f"Error inesperado al obtener el estado del servicio {service_name}: {e}", exc_info=True)
-        return None
-
-    logger.info(f"Estado para {service_name}: {status_info}")
-    return status_info
-
-def set_service_startup_type(service_name, startup_type):
-    """Cambia el tipo de inicio de un servicio de Windows."""
-    logger.info(f"Cambiando el tipo de inicio del servicio '{service_name}' a '{startup_type}'")
-    # Los tipos de inicio válidos para 'sc.exe config' son: boot, system, auto, demand, disabled
-    # Hacemos un mapeo por si usamos términos más amigables
-    valid_startup_types = {
-        "automatic": "auto",
-        "manual": "demand",
-        "disabled": "disabled"
-    }
-    
-    sc_startup_type = valid_startup_types.get(startup_type, startup_type) # Usar el valor mapeado o el original
-
-    try:
-        cmd = ["sc.exe", "config", service_name, "start=", sc_startup_type]
-        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
-
-        if result.returncode == 0:
-            logger.info(f"El tipo de inicio del servicio '{service_name}' se cambió a '{sc_startup_type}' con éxito.")
-            return True
-        else:
-            logger.error(f"Error al cambiar el tipo de inicio del servicio '{service_name}'. Salida: {result.stderr}")
-            return False
-            
-    except FileNotFoundError:
-        logger.error("El comando 'sc.exe' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        return False
-    except Exception as e:
-        logger.error(f"Error inesperado al cambiar el tipo de inicio del servicio {service_name}: {e}", exc_info=True)
-        return False
-
-
 def optimize_visual_effects():
     """Orquesta la optimización de los efectos visuales de Windows."""
     if not utils.confirm_operation("¿Está seguro de que desea optimizar los efectos visuales? Esta acción modificará el registro de Windows."):
@@ -200,16 +124,26 @@ def optimize_services():
         print(f"\n--- {i}. Deshabilitando: {service_name} ---")
         print(f"Descripción: {description}")
 
-        status = get_service_status(service_name)
+        logger.info(f"Procesando servicio: {service_name}")
+        status = utils.get_service_status(service_name)
+        logger.info(f"Estado obtenido para {service_name}: {status}")
 
-        if status and status.get('startup', '').upper() == 'DISABLED':
+        if not status or status.get('startup') == 'NOT_FOUND':
+            print(f"Información: El servicio '{service_name}' no se encontró en el sistema.")
+            logger.warning(f"Servicio no encontrado: {service_name}. Omitiendo.")
+            continue
+
+        if status.get('startup') == 'DISABLED':
             print(f"El servicio '{service_name}' ya se encuentra deshabilitado.")
+            logger.info(f"El servicio '{service_name}' ya está deshabilitado. Omitiendo.")
             continue
         
-        success = set_service_startup_type(service_name, 'disabled')
+        logger.info(f"Intentando deshabilitar el servicio '{service_name}'.")
+        success = utils.set_service_startup_type(service_name, 'disabled')
 
         if success:
             print(f"Éxito: El servicio '{service_name}' ha sido configurado como deshabilitado.")
+            logger.info(f"Servicio '{service_name}' deshabilitado con éxito.")
             changes_applied += 1
         else:
             print(f"Error al deshabilitar el servicio '{service_name}'.")
