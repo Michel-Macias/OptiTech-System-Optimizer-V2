@@ -170,7 +170,6 @@ def limpiar_copias_sombra():
         
         # Ejecutar el comando y capturar la salida, sin check=True para manejar la salida de 'no hay elementos'
         resultado = subprocess.run(comando, capture_output=True, text=True, check=False, shell=True)
-        
         # Verificar si no hay copias de sombra para eliminar (comparación más robusta)
         if "Ningun elemento cumple los criterios de la consulta." in resultado.stdout.replace('£', 'u') or \
            "No items found that satisfy the query." in resultado.stdout:
@@ -181,10 +180,11 @@ def limpiar_copias_sombra():
 
         # Si el comando falló por otra razón (código de salida distinto de 0)
         if resultado.returncode != 0:
+            error_message = resultado.stderr.strip() if resultado.stderr else resultado.stdout.strip()
             logger.error(f"Error al ejecutar el comando vssadmin para copias de sombra. Código de salida: {resultado.returncode}")
             logger.error(f"Salida de error vssadmin (stdout): {resultado.stdout}")
             logger.error(f"Salida de error vssadmin (stderr): {resultado.stderr}")
-            print(f"Error al eliminar copias de sombra. Mensaje de vssadmin: {resultado.stdout.strip()} {resultado.stderr.strip()}")
+            print(f"Error al eliminar copias de sombra. Mensaje de vssadmin: {error_message}")
             return False
 
         logger.info("Comando vssadmin ejecutado con éxito.")

@@ -175,9 +175,10 @@ class TestSystemCleaner(unittest.TestCase):
         self.assertFalse(resultado)
         mock_print.assert_any_call("Error inesperado al limpiar WinSxS: Error inesperado")
 
+    @patch('src.system_cleaner.is_admin', return_value=True)
     @patch('subprocess.run')
     @patch('builtins.print')
-    def test_limpiar_copias_sombra_exito(self, mock_print, mock_subprocess_run):
+    def test_limpiar_copias_sombra_exito(self, mock_print, mock_subprocess_run, mock_is_admin):
         """Prueba la eliminación exitosa de copias de sombra."""
         mock_result = MagicMock()
         mock_result.returncode = 0
@@ -189,22 +190,34 @@ class TestSystemCleaner(unittest.TestCase):
         self.assertTrue(resultado)
         mock_subprocess_run.assert_called_once_with(
             ["vssadmin", "delete", "shadows", "/all", "/quiet"],
-            capture_output=True, text=True, check=True, shell=True
+            capture_output=True, text=True, check=False, shell=True
         )
         mock_print.assert_any_call("Eliminación de copias de sombra completada con éxito.")
 
-    @patch('subprocess.run', side_effect=subprocess.CalledProcessError(1, 'vssadmin', stderr="Error de vssadmin"))
+    @patch('src.system_cleaner.is_admin', return_value=True)
+    @patch('subprocess.run')
     @patch('builtins.print')
-    def test_limpiar_copias_sombra_error_proceso(self, mock_print, mock_subprocess_run):
+    def test_limpiar_copias_sombra_error_proceso(self, mock_print, mock_subprocess_run, mock_is_admin):
         """Prueba el manejo de errores de proceso al eliminar copias de sombra."""
+        mock_result = MagicMock()
+        mock_result.returncode = 1 # Simula un error
+        mock_result.stdout = "" # Simula stdout vacío
+        mock_result.stderr = "Error de vssadmin" # Simula stderr
+        mock_subprocess_run.return_value = mock_result
+
         resultado = system_cleaner.limpiar_copias_sombra()
 
         self.assertFalse(resultado)
-        mock_print.assert_any_call("Error al eliminar copias de sombra: Error de vssadmin")
+        mock_subprocess_run.assert_called_once_with(
+            ["vssadmin", "delete", "shadows", "/all", "/quiet"],
+            capture_output=True, text=True, check=False, shell=True
+        )
+        mock_print.assert_any_call("Error al eliminar copias de sombra. Mensaje de vssadmin: Error de vssadmin")
 
+    @patch('src.system_cleaner.is_admin', return_value=True)
     @patch('subprocess.run', side_effect=Exception("Error inesperado"))
     @patch('builtins.print')
-    def test_limpiar_copias_sombra_error_inesperado(self, mock_print, mock_subprocess_run):
+    def test_limpiar_copias_sombra_error_inesperado(self, mock_print, mock_subprocess_run, mock_is_admin):
         """Prueba el manejo de errores inesperados al eliminar copias de sombra."""
         resultado = system_cleaner.limpiar_copias_sombra()
 
