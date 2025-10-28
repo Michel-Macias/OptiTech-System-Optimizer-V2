@@ -153,7 +153,7 @@ def optimize_services():
     logger.info(f"Finalizada la optimización de servicios. Cambios intentados: {changes_applied}")
 
 def optimize_power_plan():
-    """Activa el plan de energía de alto rendimiento de Windows."""
+    """Busca dinámicamente y activa el plan de energía de alto rendimiento de Windows."""
     if not utils.confirm_operation("¿Está seguro de que desea activar el plan de energía de alto rendimiento?"):
         logger.info("Operación de optimización del plan de energía cancelada por el usuario.")
         return
@@ -161,30 +161,52 @@ def optimize_power_plan():
     utils.show_header("Módulo de Optimización de Plan de Energía")
     logger.info("Iniciando la optimización del plan de energía.")
 
-    config = config_manager.load_config('power_plan_settings.json')
-    high_performance_guid = config.get('high_performance_guid')
-
-    if not high_performance_guid:
-        print("No se encontró el GUID del plan de energía de alto rendimiento en la configuración.")
-        logger.error("GUID del plan de energía de alto rendimiento no encontrado en 'power_plan_settings.json'.")
-        return False
-
     try:
-        cmd = ["powercfg", "/setactive", high_performance_guid]
-        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        logger.info("Buscando dinámicamente el GUID del plan de 'Alto rendimiento'.")
+        result = subprocess.run(["powercfg", "/list"], capture_output=True, text=True, encoding='oem', errors='replace')
 
-        if result.returncode == 0:
+        if result.returncode != 0:
+            print(f"Error al listar los planes de energía: {result.stderr}")
+            logger.error(f"Fallo al ejecutar 'powercfg /list'. Salida: {result.stderr}")
+            return False
+
+        high_performance_guid = None
+        for line in result.stdout.splitlines():
+            normalized_line = line.lower()
+            # Buscar tanto en español como en inglés
+            if "(alto rendimiento)" in normalized_line or "(high performance)" in normalized_line:
+                # Formato esperado: 'GUID de plan de energía: XXXXX-XXXX-.... (Alto rendimiento)'
+                parts = line.split(':')
+                if len(parts) > 1:
+                    guid_part = parts[1].strip()
+                    high_performance_guid = guid_part.split()[0]
+                    logger.info(f"GUID de 'Alto rendimiento' encontrado: {high_performance_guid}")
+                    break
+        
+        if not high_performance_guid:
+            print("No se pudo encontrar el plan de energía de 'Alto rendimiento' en este sistema.")
+            logger.error("El plan de energía de 'Alto rendimiento' no fue encontrado tras listar los planes.")
+            return False
+
+        # Activar el plan de energía encontrado
+        cmd = ["powercfg", "/setactive", high_performance_guid]
+        activation_result = subprocess.run(cmd, capture_output=True, text=True, encoding='oem', errors='replace')
+
+        if activation_result.returncode == 0:
             print("Éxito: Plan de energía de alto rendimiento activado.")
-            logger.info("Plan de energía de alto rendimiento activado con éxito.")
+            logger.info(f"Plan de energía de alto rendimiento ({high_performance_guid}) activado con éxito.")
             return True
         else:
-            print(f"Error al activar el plan de energía: {result.stderr}")
-            logger.error(f"Fallo al activar el plan de energía. Salida: {result.stderr}")
+            print(f"Error al activar el plan de energía: {activation_result.stderr}")
+            logger.error(f"Fallo al activar el plan de energía. Salida: {activation_result.stderr}")
             return False
+
     except FileNotFoundError:
+        print("Error: El comando 'powercfg' no se encontró. Asegúrese de que está en el PATH.")
         logger.error("El comando 'powercfg' no se encontró. Asegúrese de que está en el PATH del sistema.")
         return False
     except Exception as e:
+        print(f"Ocurrió un error inesperado: {e}")
         logger.error(f"Error inesperado al activar el plan de energía: {e}", exc_info=True)
         return False
 
@@ -202,37 +224,46 @@ def optimize_network():
         "Renovando IP": ["ipconfig", "/renew"],
         "Limpiando caché DNS": ["ipconfig", "/flushdns"],
         "Reiniciando Winsock": ["netsh", "winsock", "reset"],
-        "Reiniciando Pila IP": ["netsh", "int", "ip", "reset"]
+        "Reiniciando Pila IP": ["netsh", "int", "ip", "reset", "reset.log"]
     }
 
     all_successful = True
     for description, command in commands.items():
         print(f"\n--- Ejecutando: {description} ---")
         logger.info(f"Ejecutando comando de red: {' '.join(command)}")
+        
+        is_reset_command = "reset" in command and "ip" in command
+        check_status = not is_reset_command
+        
+        # Seleccionar codificación dinámicamente
+        encoding = 'utf-8' if command[0] == 'netsh' else 'oem'
+
         try:
-            result = subprocess.run(command, capture_output=True, text=True, check=True)
-            logger.info(f"Comando '{' '.join(command)}' ejecutado con éxito. Salida:\n{result.stdout}")
-            print("Comando ejecutado con éxito.")
+            result = subprocess.run(
+                command, 
+                capture_output=True, 
+                text=True, 
+                check=check_status, 
+                encoding=encoding, 
+                errors='replace'
+            )
+            if result.returncode != 0:
+                all_successful = False
+                print(f"Comando ejecutado con advertencias. Salida:\n{result.stdout}")
+                logger.warning(f"El comando '{' '.join(command)}' finalizó con código {result.returncode}. Salida:\n{result.stdout}")
+            else:
+                logger.info(f"Comando '{' '.join(command)}' ejecutado con éxito. Salida:\n{result.stdout}")
+                print("Comando ejecutado con éxito.")
+
         except FileNotFoundError:
             logger.error(f"Error: El comando '{command[0]}' no se encontró.")
             print(f"Error: El comando '{command[0]}' no se encontró. No se puede continuar.")
             all_successful = False
             break
         except subprocess.CalledProcessError as e:
+            all_successful = False
             logger.error(f"El comando '{' '.join(command)}' falló. Salida:\n{e.stderr}")
             print(f"Error al ejecutar el comando. Detalles: {e.stderr}")
-            all_successful = False
-        except Exception as e:
-            logger.error(f"Error inesperado al ejecutar '{' '.join(command)}': {e}", exc_info=True)
-            print(f"Ocurrió un error inesperado: {e}")
-            all_successful = False
 
     if all_successful:
         print("\nOptimización de red completada con éxito.")
-        logger.info("Todos los comandos de optimización de red se ejecutaron correctamente.")
-    else:
-        print("\nOptimización de red completada con errores.")
-        logger.warning("Algunos comandos de optimización de red no se pudieron completar.")
-
-    print("Es posible que necesites reiniciar el equipo para que todos los cambios surtan efecto.")
-    return all_successful
