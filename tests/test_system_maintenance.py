@@ -126,3 +126,15 @@ class TestSystemMaintenance(unittest.TestCase):
         expected_command = ["chkdsk", "C:", "/F", "/R"]
         mock_subprocess_run.assert_called_once_with(expected_command, capture_output=True, text=True, check=True)
 
+    @patch('src.system_maintenance.subprocess.run')
+    def test_run_chkdsk_rejects_malicious_input(self, mock_subprocess_run):
+        """Prueba que run_chkdsk no ejecuta el comando si la entrada es maliciosa."""
+        # Llamar a la función con una entrada potencialmente peligrosa
+        result = system_maintenance.run_chkdsk('C: & notepad')
+
+        # Verificaciones
+        self.assertFalse(result)
+        
+        # La verificación más importante: subprocess.run no debe haber sido llamado
+        mock_subprocess_run.assert_not_called()
+

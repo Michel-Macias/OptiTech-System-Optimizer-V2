@@ -32,13 +32,13 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
 
 ## Funcionalidades Clave
 
-La herramienta incluirá las siguientes funcionalidades principales:
+La herramienta incluye las siguientes funcionalidades principales:
 
-*   **Diagnóstico del Sistema**: Recopilación de información de hardware, sistema operativo, uso de CPU y espacio en disco, y estado de servicios.
-*   **Limpieza del Sistema**: Eliminación de archivos temporales, caché, logs, elementos de la papelera de reciclaje, y optimización de componentes como WinSxS.
-*   **Optimización del Rendimiento**: Ajuste de servicios no críticos, efectos visuales, plan de energía y configuración de red.
-*   **Mantenimiento y Backups**: Funciones para la gestión del registro, creación de puntos de restauración del sistema y ejecución de herramientas de integridad del sistema (SFC, DISM, CHKDSK).
-*   **Gestión de Logs**: Visualización y rotación de logs generados por la propia herramienta.
+*   **[Diagnóstico del Sistema](GUIA_USUARIO.md#1-análisis-del-sistema)**: Recopilación de información de hardware, sistema operativo, uso de CPU y espacio en disco, y estado de servicios.
+*   **[Limpieza del Sistema](GUIA_USUARIO.md#2-limpieza-del-sistema)**: Eliminación de archivos temporales, caché, logs, elementos de la papelera de reciclaje, y optimización de componentes como WinSxS.
+*   **[Optimización del Rendimiento](GUIA_USUARIO.md#3-optimización-del-sistema)**: Ajuste de servicios no críticos, efectos visuales, plan de energía y configuración de red.
+*   **[Mantenimiento y Backups](GUIA_USUARIO.md#4-mantenimiento-del-sistema)**: Funciones para la gestión del registro, creación de puntos de restauración del sistema y ejecución de herramientas de integridad del sistema (SFC, DISM, CHKDSK).
+*   **[Gestión de Logs](GUIA_USUARIO.md#5-gestión-de-logs)**: Visualización y rotación de logs generados por la propia herramienta.
 *   **Interfaz Interactiva**: Un menú principal en consola para una interacción sencilla con el usuario.
 
 ## Consideraciones Técnicas
@@ -52,7 +52,7 @@ La herramienta incluirá las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-Todo el desarrollo de funcionalidades principales está completo. El proyecto está listo para la fase de empaquetado y distribución.
+Todas las funcionalidades principales han sido implementadas y verificadas. Se ha completado una revisión de seguridad y el código ha sido reforzado. El proyecto está ahora en la fase final de documentación y listo para el empaquetado y la distribución.
 
 ## Cómo Contribuir
 

@@ -1,10 +1,8 @@
-# tests/test_system_analysis.py
-
 import unittest
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch, MagicMock, mock_open, call
 import tempfile
 import os
-from src import system_analysis
+from src import system_analysis, utils
 
 class TestSystemAnalysis(unittest.TestCase):
 
@@ -112,7 +110,10 @@ class TestSystemAnalysis(unittest.TestCase):
     @patch('src.system_analysis.get_service_status')
     @patch('src.system_analysis.config_manager.get_report_path')
     @patch("builtins.open", new_callable=mock_open)
-    def test_run_system_analysis_success(self, mock_file, mock_get_report_path, mock_get_service_status, mock_get_system_specs):
+    @patch('src.utils.show_header')
+    @patch('src.utils.show_progress_bar')
+    @patch('builtins.print')
+    def test_run_system_analysis_success(self, mock_print, mock_show_progress_bar, mock_show_header, mock_file, mock_get_report_path, mock_get_service_status, mock_get_system_specs):
         """Prueba la función principal que ejecuta el análisis."""
         # --- Mock return values ---
         mock_get_system_specs.return_value = {
@@ -130,6 +131,14 @@ class TestSystemAnalysis(unittest.TestCase):
         system_analysis.run_system_analysis()
 
         # --- Assertions ---
+        mock_show_header.assert_called_once_with("Módulo de Análisis del Sistema")
+        self.assertEqual(mock_show_progress_bar.call_count, 3) # Dos pasos de análisis + una llamada final para 100%
+        mock_show_progress_bar.assert_has_calls([
+            call(1, 2, prefix='Progreso del Análisis:', suffix='Completado', length=30),
+            call(2, 2, prefix='Progreso del Análisis:', suffix='Completado', length=30)
+        ])
+        mock_print.assert_any_call(utils.colored_text("\nAnálisis del sistema completado con éxito.", utils.Colors.GREEN))
+
         mock_file.assert_called_once()
         # Check that the file was opened in write mode with correct encoding
         self.assertEqual(mock_file.call_args[0][1], 'w')
@@ -144,7 +153,3 @@ class TestSystemAnalysis(unittest.TestCase):
         self.assertIn("En uso:     8.00 GB (50.0%)", written_content)
         self.assertIn("Servicios Totales: 10", written_content)
         self.assertIn("Dispositivo: D:\\", written_content)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -6,6 +6,7 @@ import logging
 import datetime
 import os
 from src import config_manager
+from src import utils
 
 APP_LOGGER_NAME = 'OptiTechOptimizer'
 logger = logging.getLogger(APP_LOGGER_NAME)
@@ -44,8 +45,8 @@ def get_system_specs():
         }
 
         # --- Información de Discos ---
-        partitions = psutil.disk_partitions()
         disk_info = []
+        partitions = psutil.disk_partitions()
         for partition in partitions:
             try:
                 partition_usage = psutil.disk_usage(partition.mountpoint)
@@ -102,14 +103,39 @@ def get_service_status():
 
 def run_system_analysis():
     """Ejecuta un análisis completo del sistema y guarda el informe en un archivo."""
+    utils.show_header("Módulo de Análisis del Sistema")
     logger.info("Iniciando análisis completo del sistema...")
 
-    specs = get_system_specs()
-    services = get_service_status()
+    analysis_steps = [
+        ("Recopilando especificaciones del sistema", get_system_specs),
+        ("Contando servicios del sistema", get_service_status),
+    ]
+    total_steps = len(analysis_steps)
+    current_step = 0
 
-    if not specs or not services:
-        logger.error("El análisis del sistema falló porque una o más funciones de recopilación de datos fallaron.")
-        return
+    specs = None
+    services = None
+
+    for description, func in analysis_steps:
+        current_step += 1
+        print(f"\n{description}...")
+        utils.show_progress_bar(current_step, total_steps, prefix='Progreso del Análisis:', suffix='Completado', length=30)
+        
+        if func == get_system_specs:
+            specs = func()
+        elif func == get_service_status:
+            services = func()
+
+        if (func == get_system_specs and specs is None) or \
+           (func == get_service_status and services is None):
+            logger.error(f"El paso de análisis '{description}' falló.")
+            print(utils.colored_text(f"Error: El análisis de '{description}' falló.", utils.Colors.RED))
+            return
+
+    # Asegurarse de que la barra de progreso finalice en 100%
+    utils.show_progress_bar(total_steps, total_steps, prefix='Progreso del Análisis:', suffix='Completado', length=30)
+    print(utils.colored_text("\nAnálisis del sistema completado con éxito.", utils.Colors.GREEN))
+
     # --- Construir Informe en Markdown (más legible) ---
     report_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -228,7 +254,6 @@ def run_system_analysis():
 
         # Mostrar un resumen formateado en la consola para el usuario (más legible)
         try:
-            from src import utils as _utils
             _utils.show_header("Resumen del Análisis del Sistema")
             print(f"Sistema: {specs['os_info']['system']} {specs['os_info']['release']} ({specs['os_info']['architecture']})")
             print(f"Hostname: {specs['os_info']['hostname']}")
@@ -238,11 +263,11 @@ def run_system_analysis():
             print('\nDiscos:')
             for d in specs['disk_info']:
                 print(f" - {d['mountpoint']}: {d['used']} / {d['total_size']} ({d['percentage']})")
-            print(f"\nInforme guardado en: {file_path}")
+            print(utils.colored_text(f"\nInforme guardado en: {file_path}", utils.Colors.GREEN))
         except Exception:
             # Si por alguna razón la impresión fallase, no detener el flujo
             pass
 
     except Exception as e:
         logger.error(f"Fallo al guardar el informe de análisis: {e}", exc_info=True)
-
+        print(utils.colored_text(f"Error al guardar el informe de análisis: {e}", utils.Colors.RED))

@@ -45,24 +45,24 @@ def backup_registry():
 
         if result.returncode == 0:
             logger.info(f"Backup del registro creado con éxito en {backup_filename}")
-            print("Backup del registro completado con éxito.")
+            print(utils.colored_text("Backup del registro completado con éxito.", utils.Colors.GREEN))
             return True
         else:
             logger.error(f"Error al crear el backup del registro. Stderr: {result.stderr}")
-            print(f"Error al crear el backup del registro: {result.stderr}")
+            print(utils.colored_text(f"Error al crear el backup del registro: {result.stderr}", utils.Colors.RED))
             return False
 
     except FileNotFoundError:
         logger.error("El comando 'reg' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print("Error: El comando 'reg' no se encontró.")
+        print(utils.colored_text("Error: El comando 'reg' no se encontró.", utils.Colors.RED))
         return False
     except subprocess.CalledProcessError as e:
         logger.error(f"El comando de backup del registro falló. Stderr: {e.stderr}")
-        print(f"Error durante el backup del registro: {e.stderr}")
+        print(utils.colored_text(f"Error durante el backup del registro: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Error inesperado durante el backup del registro: {e}", exc_info=True)
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         return False
 
 def restore_registry(backup_path):
@@ -71,7 +71,7 @@ def restore_registry(backup_path):
 
     if not os.path.exists(backup_path):
         logger.error(f"El archivo de backup no existe: {backup_path}")
-        print(f"Error: El archivo de backup no fue encontrado en '{backup_path}'.")
+        print(utils.colored_text(f"Error: El archivo de backup no fue encontrado en '{backup_path}'.", utils.Colors.RED))
         return False
 
     try:
@@ -82,24 +82,24 @@ def restore_registry(backup_path):
 
         if result.returncode == 0:
             logger.info(f"Restauración del registro completada con éxito desde {backup_path}")
-            print("Restauración del registro completada con éxito.")
+            print(utils.colored_text("Restauración del registro completada con éxito.", utils.Colors.GREEN))
             return True
         else:
             logger.error(f"Error al restaurar el registro. Stderr: {result.stderr}")
-            print(f"Error al restaurar el registro: {result.stderr}")
+            print(utils.colored_text(f"Error al restaurar el registro: {result.stderr}", utils.Colors.RED))
             return False
 
     except FileNotFoundError:
         logger.error("El comando 'reg' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print("Error: El comando 'reg' no se encontró.")
+        print(utils.colored_text("Error: El comando 'reg' no se encontró.", utils.Colors.RED))
         return False
     except subprocess.CalledProcessError as e:
         logger.error(f"El comando de restauración del registro falló. Stderr: {e.stderr}")
-        print(f"Error durante la restauración del registro: {e.stderr}")
+        print(utils.colored_text(f"Error durante la restauración del registro: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Error inesperado durante la restauración del registro: {e}", exc_info=True)
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         return False
 
 def create_system_restore_point(description):
@@ -120,24 +120,24 @@ def create_system_restore_point(description):
 
         if result.returncode == 0:
             logger.info("Punto de restauración del sistema creado con éxito.")
-            print("Punto de restauración del sistema creado con éxito.")
+            print(utils.colored_text("Punto de restauración del sistema creado con éxito.", utils.Colors.GREEN))
             return True
         else:
             logger.error(f"Error al crear el punto de restauración. Stderr: {result.stderr}")
-            print(f"Error al crear el punto de restauración: {result.stderr}")
+            print(utils.colored_text(f"Error al crear el punto de restauración: {result.stderr}", utils.Colors.RED))
             return False
 
     except FileNotFoundError:
         logger.error("El comando 'powershell.exe' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print("Error: El comando 'powershell.exe' no se encontró.")
+        print(utils.colored_text("Error: El comando 'powershell.exe' no se encontró.", utils.Colors.RED))
         return False
     except subprocess.CalledProcessError as e:
         logger.error(f"El comando de creación de punto de restauración falló. Stderr: {e.stderr}")
-        print(f"Error durante la creación del punto de restauración: {e.stderr}")
+        print(utils.colored_text(f"Error durante la creación del punto de restauración: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Error inesperado durante la creación del punto de restauración: {e}", exc_info=True)
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         return False
 
 def run_sfc():
@@ -150,24 +150,24 @@ def run_sfc():
 
         if result.returncode == 0:
             logger.info("Escaneo SFC completado con éxito.")
-            print("Escaneo SFC completado con éxito.")
+            print(utils.colored_text("Escaneo SFC completado con éxito.", utils.Colors.GREEN))
             return True
         else:
             logger.error(f"Error durante el escaneo SFC. Stderr: {result.stderr}")
-            print(f"Error durante el escaneo SFC: {result.stderr}")
+            print(utils.colored_text(f"Error durante el escaneo SFC: {result.stderr}", utils.Colors.RED))
             return False
 
     except FileNotFoundError:
         logger.error("El comando 'sfc' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print("Error: El comando 'sfc' no se encontró.")
+        print(utils.colored_text("Error: El comando 'sfc' no se encontró.", utils.Colors.RED))
         return False
     except subprocess.CalledProcessError as e:
         logger.error(f"El comando SFC falló. Stderr: {e.stderr}")
-        print(f"Error durante el escaneo SFC: {e.stderr}")
+        print(utils.colored_text(f"Error durante el escaneo SFC: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Error inesperado durante el escaneo SFC: {e}", exc_info=True)
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         return False
 
 def run_dism():
@@ -180,29 +180,36 @@ def run_dism():
 
         if result.returncode == 0:
             logger.info("DISM completado con éxito.")
-            print("DISM completado con éxito.")
+            print(utils.colored_text("DISM completado con éxito.", utils.Colors.GREEN))
             return True
         else:
             logger.error(f"Error durante la ejecución de DISM. Stderr: {result.stderr}")
-            print(f"Error durante la ejecución de DISM: {result.stderr}")
+            print(utils.colored_text(f"Error durante la ejecución de DISM: {result.stderr}", utils.Colors.RED))
             return False
 
     except FileNotFoundError:
         logger.error("El comando 'DISM' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print("Error: El comando 'DISM' no se encontró.")
+        print(utils.colored_text("Error: El comando 'DISM' no se encontró.", utils.Colors.RED))
         return False
     except subprocess.CalledProcessError as e:
         logger.error(f"El comando DISM falló. Stderr: {e.stderr}")
-        print(f"Error durante la ejecución de DISM: {e.stderr}")
+        print(utils.colored_text(f"Error durante la ejecución de DISM: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Error inesperado durante la ejecución de DISM: {e}", exc_info=True)
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         return False
 
 def run_chkdsk(drive):
     """Ejecuta CHKDSK en una unidad específica."""
     logger.info(f"Iniciando CHKDSK en la unidad {drive}.")
+
+    # Validación de seguridad: asegurar que la entrada es solo una letra de unidad.
+    if not (drive and len(drive) == 2 and drive[0].isalpha() and drive[1] == ':'):
+        logger.warning(utils.colored_text(f"Entrada de unidad para CHKDSK no válida o potencialmente maliciosa: '{drive}'", utils.Colors.YELLOW))
+        print(utils.colored_text(f"Error: La unidad especificada '{drive}' no es válida.", utils.Colors.RED))
+        return False
+
     try:
         print(f"Ejecutando CHKDSK en la unidad {drive}. Esto puede tardar varios minutos...")
         command = ["chkdsk", drive, "/F", "/R"]
@@ -210,24 +217,24 @@ def run_chkdsk(drive):
 
         if result.returncode == 0:
             logger.info(f"CHKDSK en la unidad {drive} completado con éxito.")
-            print(f"CHKDSK en la unidad {drive} completado con éxito.")
+            print(utils.colored_text(f"CHKDSK en la unidad {drive} completado con éxito.", utils.Colors.GREEN))
             return True
         else:
             logger.error(f"Error durante la ejecución de CHKDSK en la unidad {drive}. Stderr: {result.stderr}")
-            print(f"Error durante la ejecución de CHKDSK en la unidad {drive}: {result.stderr}")
+            print(utils.colored_text(f"Error durante la ejecución de CHKDSK en la unidad {drive}: {result.stderr}", utils.Colors.RED))
             return False
 
     except FileNotFoundError:
         logger.error("El comando 'chkdsk' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print("Error: El comando 'chkdsk' no se encontró.")
+        print(utils.colored_text("Error: El comando 'chkdsk' no se encontró.", utils.Colors.RED))
         return False
     except subprocess.CalledProcessError as e:
         logger.error(f"El comando CHKDSK falló. Stderr: {e.stderr}")
-        print(f"Error durante la ejecución de CHKDSK: {e.stderr}")
+        print(utils.colored_text(f"Error durante la ejecución de CHKDSK: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Error inesperado durante la ejecución de CHKDSK: {e}", exc_info=True)
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         return False
 
 def run_maintenance():
@@ -286,13 +293,9 @@ def run_maintenance():
             if utils.confirm_operation("¿Está seguro de que desea ejecutar DISM /RestoreHealth? Esto puede tardar un tiempo."):
                 run_dism()
         elif choice == '6':
-            drive = input("Ingrese la letra de la unidad para CHKDSK (ej. C): ").strip().upper()
-            if drive and len(drive) == 1 and drive.isalpha():
-                if utils.confirm_operation(f"¿Está seguro de que desea ejecutar CHKDSK en la unidad {drive}:? Esto puede requerir un reinicio."):
-                    run_chkdsk(f"{drive}:")
-            else:
-                print("Entrada de unidad no válida.")
-                logger.warning(f"Entrada de unidad CHKDSK no válida: {drive}")
+            drive_letter = input("Ingrese la letra de la unidad para CHKDSK (ej. C): ").strip().upper()
+            if utils.confirm_operation(f"¿Está seguro de que desea ejecutar CHKDSK en la unidad {drive_letter}:? Esto puede requerir un reinicio."):
+                run_chkdsk(f"{drive_letter}:")
         elif choice == '7':
             print("Volviendo al menú principal...")
             logger.info("Saliendo del módulo de mantenimiento.")

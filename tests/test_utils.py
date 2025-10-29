@@ -12,9 +12,9 @@ class TestUtils(unittest.TestCase):
     def test_show_header(self, mock_stdout):
         utils.show_header("Test Header", screen_width=20)
         expected_output = (
-            "====================\n"
-            "    Test Header     \n"
-            "====================\n\n"
+            f"{utils.Colors.CYAN}{utils.Colors.BOLD}===================={utils.Colors.RESET}\n" +
+            f"{utils.Colors.CYAN}{utils.Colors.BOLD}    Test Header     {utils.Colors.RESET}\n" +
+            f"{utils.Colors.CYAN}{utils.Colors.BOLD}===================={utils.Colors.RESET}\n\n"
         )
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 

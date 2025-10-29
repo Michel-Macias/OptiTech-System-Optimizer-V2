@@ -7,6 +7,38 @@ import os
 import subprocess
 
 
+# --- Utilidades de color para la consola ---
+# NOTA: Los colores ANSI pueden no mostrarse correctamente en todas las consolas de Windows (ej. cmd.exe antiguo).
+# Se recomienda usar PowerShell, Windows Terminal o VS Code Terminal para una experiencia visual completa.
+class Colors:
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+    
+    # Colores de texto
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    
+    # Colores de fondo
+    BG_BLACK = '\033[40m'
+    BG_RED = '\033[41m'
+    BG_GREEN = '\033[42m'
+    BG_YELLOW = '\033[43m'
+    BG_BLUE = '\033[44m'
+    BG_MAGENTA = '\033[45m'
+    BG_CYAN = '\033[46m'
+    BG_WHITE = '\033[47m'
+
+def colored_text(text, color_code):
+    """Envuelve un texto con códigos de color ANSI para imprimir en la consola."""
+    return f"{color_code}{text}{Colors.RESET}"
+
+
 
 def set_registry_value(hive, key, value_name, value, value_type):
     """
@@ -68,9 +100,9 @@ def show_header(text, screen_width=80):
         text (str): The text to display in the header.
         screen_width (int): The width of the header in characters.
     """
-    print("=" * screen_width)
-    print(text.center(screen_width))
-    print("=" * screen_width)
+    print(colored_text("=" * screen_width, Colors.CYAN + Colors.BOLD))
+    print(colored_text(text.center(screen_width), Colors.CYAN + Colors.BOLD))
+    print(colored_text("=" * screen_width, Colors.CYAN + Colors.BOLD))
     print() # Add a blank line for spacing
 
 def confirm_operation(prompt):

@@ -91,10 +91,10 @@ def optimize_visual_effects():
         )
 
         if success:
-            print(f"Éxito: Configuración '{description}' aplicada.")
+            print(utils.colored_text(f"Éxito: Configuración '{description}' aplicada.", utils.Colors.GREEN))
             changes_applied += 1
         else:
-            print(f"Error al aplicar '{description}': {message}")
+            print(utils.colored_text(f"Error al aplicar '{description}': {message}", utils.Colors.RED))
             logger.error(f"Fallo al establecer el valor del registro para '{description}': {message}")
 
     print(f"\nOptimización de efectos visuales completada. Se aplicaron {changes_applied} cambios.")
@@ -113,7 +113,7 @@ def optimize_services():
     services_to_disable = config.get('services', [])
 
     if not services_to_disable:
-        print("No se encontraron configuraciones para la optimización de servicios.")
+        print(utils.colored_text("No se encontraron configuraciones para la optimización de servicios.", utils.Colors.YELLOW))
         logger.warning("El archivo 'services_to_optimize.json' no se encontró o está vacío.")
         return
 
@@ -129,12 +129,12 @@ def optimize_services():
         logger.info(f"Estado obtenido para {service_name}: {status}")
 
         if not status or status.get('startup') == 'NOT_FOUND':
-            print(f"Información: El servicio '{service_name}' no se encontró en el sistema.")
+            print(utils.colored_text(f"Información: El servicio '{service_name}' no se encontró en el sistema.", utils.Colors.YELLOW))
             logger.warning(f"Servicio no encontrado: {service_name}. Omitiendo.")
             continue
 
         if status.get('startup') == 'DISABLED':
-            print(f"El servicio '{service_name}' ya se encuentra deshabilitado.")
+            print(utils.colored_text(f"El servicio '{service_name}' ya se encuentra deshabilitado.", utils.Colors.YELLOW))
             logger.info(f"El servicio '{service_name}' ya está deshabilitado. Omitiendo.")
             continue
         
@@ -142,11 +142,11 @@ def optimize_services():
         success = utils.set_service_startup_type(service_name, 'disabled')
 
         if success:
-            print(f"Éxito: El servicio '{service_name}' ha sido configurado como deshabilitado.")
+            print(utils.colored_text(f"Éxito: El servicio '{service_name}' ha sido configurado como deshabilitado.", utils.Colors.GREEN))
             logger.info(f"Servicio '{service_name}' deshabilitado con éxito.")
             changes_applied += 1
         else:
-            print(f"Error al deshabilitar el servicio '{service_name}'.")
+            print(utils.colored_text(f"Error al deshabilitar el servicio '{service_name}'.", utils.Colors.RED))
             logger.error(f"Fallo al cambiar el tipo de inicio para el servicio '{service_name}'.")
 
     print(f"\nOptimización de servicios completada. Se intentaron {changes_applied} cambios.")
@@ -166,7 +166,7 @@ def optimize_power_plan():
         result = subprocess.run(["powercfg", "/list"], capture_output=True, text=True, encoding='oem', errors='replace')
 
         if result.returncode != 0:
-            print(f"Error al listar los planes de energía: {result.stderr}")
+            print(utils.colored_text(f"Error al listar los planes de energía: {result.stderr}", utils.Colors.RED))
             logger.error(f"Fallo al ejecutar 'powercfg /list'. Salida: {result.stderr}")
             return False
 
@@ -184,7 +184,7 @@ def optimize_power_plan():
                     break
         
         if not high_performance_guid:
-            print("No se pudo encontrar el plan de energía de 'Alto rendimiento' en este sistema.")
+            print(utils.colored_text("No se pudo encontrar el plan de energía de 'Alto rendimiento' en este sistema.", utils.Colors.YELLOW))
             logger.error("El plan de energía de 'Alto rendimiento' no fue encontrado tras listar los planes.")
             return False
 
@@ -193,20 +193,20 @@ def optimize_power_plan():
         activation_result = subprocess.run(cmd, capture_output=True, text=True, encoding='oem', errors='replace')
 
         if activation_result.returncode == 0:
-            print("Éxito: Plan de energía de alto rendimiento activado.")
+            print(utils.colored_text("Éxito: Plan de energía de alto rendimiento activado.", utils.Colors.GREEN))
             logger.info(f"Plan de energía de alto rendimiento ({high_performance_guid}) activado con éxito.")
             return True
         else:
-            print(f"Error al activar el plan de energía: {activation_result.stderr}")
+            print(utils.colored_text(f"Error al activar el plan de energía: {activation_result.stderr}", utils.Colors.RED))
             logger.error(f"Fallo al activar el plan de energía. Salida: {activation_result.stderr}")
             return False
 
     except FileNotFoundError:
-        print("Error: El comando 'powercfg' no se encontró. Asegúrese de que está en el PATH.")
+        print(utils.colored_text("Error: El comando 'powercfg' no se encontró. Asegúrese de que está en el PATH.", utils.Colors.RED))
         logger.error("El comando 'powercfg' no se encontró. Asegúrese de que está en el PATH del sistema.")
         return False
     except Exception as e:
-        print(f"Ocurrió un error inesperado: {e}")
+        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
         logger.error(f"Error inesperado al activar el plan de energía: {e}", exc_info=True)
         return False
 
@@ -249,21 +249,21 @@ def optimize_network():
             )
             if result.returncode != 0:
                 all_successful = False
-                print(f"Comando ejecutado con advertencias. Salida:\n{result.stdout}")
+                print(utils.colored_text(f"Comando ejecutado con advertencias. Salida:\n{result.stdout}", utils.Colors.YELLOW))
                 logger.warning(f"El comando '{' '.join(command)}' finalizó con código {result.returncode}. Salida:\n{result.stdout}")
             else:
                 logger.info(f"Comando '{' '.join(command)}' ejecutado con éxito. Salida:\n{result.stdout}")
-                print("Comando ejecutado con éxito.")
+                print(utils.colored_text("Comando ejecutado con éxito.", utils.Colors.GREEN))
 
         except FileNotFoundError:
             logger.error(f"Error: El comando '{command[0]}' no se encontró.")
-            print(f"Error: El comando '{command[0]}' no se encontró. No se puede continuar.")
+            print(utils.colored_text(f"Error: El comando '{command[0]}' no se encontró. No se puede continuar.", utils.Colors.RED))
             all_successful = False
             break
         except subprocess.CalledProcessError as e:
             all_successful = False
             logger.error(f"El comando '{' '.join(command)}' falló. Salida:\n{e.stderr}")
-            print(f"Error al ejecutar el comando. Detalles: {e.stderr}")
+            print(utils.colored_text(f"Error al ejecutar el comando. Detalles: {e.stderr}", utils.Colors.RED))
 
     if all_successful:
-        print("\nOptimización de red completada con éxito.")
+        print(utils.colored_text("\nOptimización de red completada con éxito.", utils.Colors.GREEN))

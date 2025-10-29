@@ -2,13 +2,14 @@
 
 import unittest
 from unittest.mock import patch, MagicMock, call
-from src import system_cleaner
+from src import system_cleaner, utils
 import os
 import winshell
 import subprocess
 
 class TestSystemCleaner(unittest.TestCase):
 
+    @patch('src.utils.show_progress_bar')
     @patch('os.path.getsize')
     @patch('os.remove')
     @patch('os.walk')
@@ -18,7 +19,8 @@ class TestSystemCleaner(unittest.TestCase):
         'extendido': ['/mock/prefetch'],
         'avanzado': []
     })
-    def test_limpiar_archivos_temporales_informe(self, mock_exists, mock_walk, mock_remove, mock_getsize):
+    @patch('builtins.print')
+    def test_limpiar_archivos_temporales_informe(self, mock_print, mock_exists, mock_walk, mock_remove, mock_getsize, mock_show_progress_bar):
         """Prueba que el modo informe calcula el tamaño pero no elimina archivos."""
         # Mock del sistema de archivos
         mock_walk.return_value = [('/mock/temp', ('subdir',), ('file1.tmp', 'file2.log'))]
@@ -29,7 +31,10 @@ class TestSystemCleaner(unittest.TestCase):
         self.assertEqual(archivos_eliminados, 2)
         self.assertEqual(total_eliminado, 2048)
         mock_remove.assert_not_called() # Verificar que no se llamó a os.remove
+        mock_show_progress_bar.assert_called() # Verificar que la barra de progreso fue llamada
+        mock_print.assert_any_call(utils.colored_text(f"Limpieza completada. Total de archivos procesados para eliminación: {archivos_eliminados}. Espacio total recuperado: {total_eliminado / (1024*1024):.2f} MB.", utils.Colors.GREEN))
 
+    @patch('src.utils.show_progress_bar')
     @patch('os.path.getsize')
     @patch('os.remove')
     @patch('os.walk')
@@ -39,7 +44,8 @@ class TestSystemCleaner(unittest.TestCase):
         'extendido': ['/mock/prefetch'],
         'avanzado': []
     })
-    def test_limpiar_archivos_temporales_eliminacion(self, mock_exists, mock_walk, mock_remove, mock_getsize):
+    @patch('builtins.print')
+    def test_limpiar_archivos_temporales_eliminacion(self, mock_print, mock_exists, mock_walk, mock_remove, mock_getsize, mock_show_progress_bar):
         """Prueba que el modo de eliminación llama a os.remove."""
         mock_walk.return_value = [('/mock/temp', (), ('file1.tmp',))]
         mock_getsize.return_value = 512
@@ -49,7 +55,10 @@ class TestSystemCleaner(unittest.TestCase):
         self.assertEqual(archivos_eliminados, 1)
         self.assertEqual(total_eliminado, 512)
         mock_remove.assert_called_once_with(os.path.join('/mock/temp', 'file1.tmp'))
+        mock_show_progress_bar.assert_called() # Verificar que la barra de progreso fue llamada
+        mock_print.assert_any_call(utils.colored_text(f"Limpieza completada. Total de archivos procesados para eliminación: {archivos_eliminados}. Espacio total recuperado: {total_eliminado / (1024*1024):.2f} MB.", utils.Colors.GREEN))
 
+    @patch('src.utils.show_progress_bar')
     @patch('os.path.getsize')
     @patch('os.remove')
     @patch('os.walk')
@@ -59,13 +68,14 @@ class TestSystemCleaner(unittest.TestCase):
         'extendido': ['/mock/prefetch'],
         'avanzado': []
     })
-    def test_niveles_de_limpieza(self, mock_exists, mock_walk, mock_remove, mock_getsize):
+    @patch('builtins.print')
+    def test_niveles_de_limpieza(self, mock_print, mock_exists, mock_walk, mock_remove, mock_getsize, mock_show_progress_bar):
         """Prueba que el nivel 'extendido' incluye las rutas del nivel 'basico'."""
         # Simular dos rutas con un archivo cada una
         mock_walk.side_effect = [
             [('/mock/temp', (), ('file1.tmp',))],
             [('/mock/prefetch', (), ('file2.pf',))]
-        ]
+        ] * 2 # Duplicar para simular la pre-lectura de archivos y luego el procesamiento
         mock_getsize.return_value = 1000
 
         total_eliminado, archivos_eliminados = system_cleaner.limpiar_archivos_temporales(nivel='extendido', modo_informe=True)
@@ -73,9 +83,12 @@ class TestSystemCleaner(unittest.TestCase):
         self.assertEqual(archivos_eliminados, 2)
         self.assertEqual(total_eliminado, 2000)
         # Verificar que se procesaron ambas rutas
-        self.assertEqual(mock_walk.call_count, 2)
+        self.assertEqual(mock_walk.call_count, 4)
         mock_walk.assert_has_calls([call('/mock/temp'), call('/mock/prefetch')])
+        mock_show_progress_bar.assert_called() # Verificar que la barra de progreso fue llamada
+        mock_print.assert_any_call(utils.colored_text(f"Limpieza completada. Total de archivos procesados para eliminación: {archivos_eliminados}. Espacio total recuperado: {total_eliminado / (1024*1024):.2f} MB.", utils.Colors.GREEN))
 
+    @patch('src.utils.show_progress_bar')
     @patch('os.path.getsize', return_value=1)
     @patch('os.remove', side_effect=PermissionError)
     @patch('os.walk')
@@ -85,7 +98,8 @@ class TestSystemCleaner(unittest.TestCase):
         'extendido': [],
         'avanzado': []
     })
-    def test_manejo_permission_error(self, mock_exists, mock_walk, mock_remove, mock_getsize):
+    @patch('builtins.print')
+    def test_manejo_permission_error(self, mock_print, mock_exists, mock_walk, mock_remove, mock_getsize, mock_show_progress_bar):
         """Prueba que la limpieza continúa a pesar de un PermissionError."""
         mock_walk.return_value = [('/mock/locked_dir', (), ('locked_file.lck',))]
 
@@ -96,6 +110,8 @@ class TestSystemCleaner(unittest.TestCase):
         self.assertEqual(archivos_eliminados, 0)
         self.assertEqual(total_eliminado, 0)
         mock_remove.assert_called_once()
+        mock_show_progress_bar.assert_called() # Verificar que la barra de progreso fue llamada
+        mock_print.assert_any_call(utils.colored_text(f"Limpieza completada. Total de archivos procesados para eliminación: {archivos_eliminados}. Espacio total recuperado: {total_eliminado / (1024*1024):.2f} MB.", utils.Colors.GREEN))
 
     @patch('winshell.recycle_bin')
     @patch('builtins.print')
@@ -109,7 +125,7 @@ class TestSystemCleaner(unittest.TestCase):
 
         self.assertTrue(resultado)
         mock_recycle_bin_instance.empty.assert_called_once_with(confirm=False, show_progress=True, sound=False)
-        mock_print.assert_any_call("La papelera de reciclaje ha sido vaciada con éxito.")
+        mock_print.assert_any_call(utils.colored_text("La papelera de reciclaje ha sido vaciada con éxito.", utils.Colors.GREEN))
 
     @patch('winshell.recycle_bin')
     @patch('builtins.print')
@@ -123,7 +139,7 @@ class TestSystemCleaner(unittest.TestCase):
 
         self.assertTrue(resultado)
         mock_recycle_bin_instance.empty.assert_not_called()
-        mock_print.assert_any_call("La papelera de reciclaje ya está vacía.")
+        mock_print.assert_any_call(utils.colored_text("La papelera de reciclaje ya está vacía.", utils.Colors.YELLOW))
 
     @patch('winshell.recycle_bin')
     @patch('builtins.print')
@@ -137,7 +153,7 @@ class TestSystemCleaner(unittest.TestCase):
         resultado = system_cleaner.limpiar_papelera_reciclaje_seguro()
 
         self.assertFalse(resultado)
-        mock_print.assert_any_call("Error al vaciar la papelera de reciclaje: Error de prueba")
+        mock_print.assert_any_call(utils.colored_text("Error al vaciar la papelera de reciclaje: Error de prueba", utils.Colors.RED))
 
     @patch('subprocess.run')
     @patch('builtins.print')
@@ -155,7 +171,7 @@ class TestSystemCleaner(unittest.TestCase):
             ["Dism.exe", "/online", "/Cleanup-Image", "/StartComponentCleanup"],
             capture_output=True, text=True, check=True, shell=True
         )
-        mock_print.assert_any_call("Limpieza de WinSxS completada con éxito.")
+        mock_print.assert_any_call(utils.colored_text("Limpieza de WinSxS completada con éxito.", utils.Colors.GREEN))
 
     @patch('subprocess.run', side_effect=subprocess.CalledProcessError(1, 'Dism.exe', stderr="Error de DISM"))
     @patch('builtins.print')
@@ -164,7 +180,7 @@ class TestSystemCleaner(unittest.TestCase):
         resultado = system_cleaner.limpiar_winsxs()
 
         self.assertFalse(resultado)
-        mock_print.assert_any_call("Error al limpiar WinSxS: Error de DISM")
+        mock_print.assert_any_call(utils.colored_text("Error al limpiar WinSxS: Error de DISM", utils.Colors.RED))
 
     @patch('subprocess.run', side_effect=Exception("Error inesperado"))
     @patch('builtins.print')
@@ -173,7 +189,7 @@ class TestSystemCleaner(unittest.TestCase):
         resultado = system_cleaner.limpiar_winsxs()
 
         self.assertFalse(resultado)
-        mock_print.assert_any_call("Error inesperado al limpiar WinSxS: Error inesperado")
+        mock_print.assert_any_call(utils.colored_text("Error inesperado al limpiar WinSxS: Error inesperado", utils.Colors.RED))
 
     @patch('src.system_cleaner.is_admin', return_value=True)
     @patch('subprocess.run')
@@ -192,7 +208,7 @@ class TestSystemCleaner(unittest.TestCase):
             ["vssadmin", "delete", "shadows", "/all", "/quiet"],
             capture_output=True, text=True, check=False, shell=True
         )
-        mock_print.assert_any_call("Eliminación de copias de sombra completada con éxito.")
+        mock_print.assert_any_call(utils.colored_text("Eliminación de copias de sombra completada con éxito.", utils.Colors.GREEN))
 
     @patch('src.system_cleaner.is_admin', return_value=True)
     @patch('subprocess.run')
@@ -212,7 +228,7 @@ class TestSystemCleaner(unittest.TestCase):
             ["vssadmin", "delete", "shadows", "/all", "/quiet"],
             capture_output=True, text=True, check=False, shell=True
         )
-        mock_print.assert_any_call("Error al eliminar copias de sombra. Mensaje de vssadmin: Error de vssadmin")
+        mock_print.assert_any_call(utils.colored_text("Error al eliminar copias de sombra. Mensaje de vssadmin: Error de vssadmin", utils.Colors.RED))
 
     @patch('src.system_cleaner.is_admin', return_value=True)
     @patch('subprocess.run', side_effect=Exception("Error inesperado"))
@@ -222,7 +238,7 @@ class TestSystemCleaner(unittest.TestCase):
         resultado = system_cleaner.limpiar_copias_sombra()
 
         self.assertFalse(resultado)
-        mock_print.assert_any_call("Error inesperado al eliminar copias de sombra: Error inesperado")
+        mock_print.assert_any_call(utils.colored_text("Error inesperado al eliminar copias de sombra: Error inesperado", utils.Colors.RED))
 
     @patch('builtins.input', side_effect=['1', 'n', 'y', '0']) # Selecciona limpieza básica, no modo informe, confirma, luego sale
     @patch('builtins.print')
@@ -242,7 +258,9 @@ class TestSystemCleaner(unittest.TestCase):
         mock_limpiar_winsxs.assert_not_called()
         mock_limpiar_copias_sombra.assert_not_called()
         mock_print.assert_any_call("\nSeleccione una opción de limpieza:")
-        mock_print.assert_any_call("Limpieza completada. Total de archivos procesados para eliminación: 1. Espacio total recuperado: 0.00 MB.")
+        # Verificar que el mensaje de éxito coloreado está en alguna de las llamadas a print
+        expected_success_message = "Limpieza completada. Total de archivos procesados para eliminación: 1. Espacio total recuperado: 0.00 MB."
+        self.assertTrue(any(expected_success_message in call_args[0][0] for call_args in mock_print.call_args_list))
 
     @patch('builtins.input', side_effect=['3', 'y', '0']) # Selecciona papelera, confirma, luego sale
     @patch('builtins.print')
@@ -266,7 +284,6 @@ class TestSystemCleaner(unittest.TestCase):
         """Prueba la selección de una opción no válida."""
         system_cleaner.ejecutar_limpiador()
 
-        mock_print.assert_any_call("Opción no válida. Por favor, intente de nuevo.")
-
-if __name__ == '__main__':
-    unittest.main()
+        # Verificar que el mensaje de opción no válida coloreado está en alguna de las llamadas a print
+        expected_invalid_option_message = "Opción no válida. Por favor, intente de nuevo."
+        self.assertTrue(any(expected_invalid_option_message in call_args[0][0] for call_args in mock_print.call_args_list))

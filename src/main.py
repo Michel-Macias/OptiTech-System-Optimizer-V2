@@ -74,9 +74,10 @@ def main():
             log_manager.view_logs(config_manager.get_log_path())
         elif opcion == '0':
             app_logger.info("Aplicación finalizada.")
+            print(utils.colored_text("Saliendo de OptiTech System Optimizer. ¡Hasta pronto!", utils.Colors.GREEN))
             break
         else:
-            print("Opción no válida. Por favor, intente de nuevo.")
+            print(utils.colored_text("Opción no válida. Por favor, intente de nuevo.", utils.Colors.YELLOW))
             app_logger.warning(f"Opción de menú principal no válida seleccionada: {opcion}")
 
 if __name__ == "__main__":

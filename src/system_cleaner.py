@@ -46,6 +46,14 @@ def limpiar_archivos_temporales(nivel='basico', modo_informe=False):
     total_eliminado = 0
     archivos_eliminados = 0
 
+    total_archivos_a_procesar = 0
+    for ruta in rutas_a_limpiar:
+        if os.path.exists(ruta):
+            for _, _, filenames in os.walk(ruta):
+                total_archivos_a_procesar += len(filenames)
+
+    archivos_procesados_actualmente = 0
+
     for ruta in rutas_a_limpiar:
         if not os.path.exists(ruta):
             logger.warning(f"La ruta no existe, omitiendo: {ruta}")
@@ -67,17 +75,26 @@ def limpiar_archivos_temporales(nivel='basico', modo_informe=False):
                         logger.debug(f"Eliminado archivo: {ruta_completa}")
                 except FileNotFoundError:
                     logger.warning(f"Archivo no encontrado al intentar eliminar, puede haber sido eliminado por otro proceso: {ruta_completa}")
-                    continue
+                    pass # Continuar con el siguiente archivo
                 except PermissionError:
                     logger.warning(f"Permiso denegado para eliminar: {ruta_completa}")
-                    continue
+                    pass # Continuar con el siguiente archivo
                 except Exception as e:
                     logger.error(f"Error inesperado al eliminar {ruta_completa}: {e}")
-                    continue
+                    pass # Continuar con el siguiente archivo
+                
+                archivos_procesados_actualmente += 1
+                utils.show_progress_bar(archivos_procesados_actualmente, total_archivos_a_procesar, prefix = 'Progreso de limpieza:', suffix = 'Completado', length = 30)
+    
+    # Asegurarse de que la barra de progreso finalice en 100% y con un salto de línea
+    if total_archivos_a_procesar > 0:
+        utils.show_progress_bar(total_archivos_a_procesar, total_archivos_a_procesar, prefix = 'Progreso de limpieza:', suffix = 'Completado', length = 30)
+    else:
+        print("No se encontraron archivos para limpiar.")
     
     resumen = f"Limpieza completada. Total de archivos procesados para eliminación: {archivos_eliminados}. Espacio total recuperado: {total_eliminado / (1024*1024):.2f} MB."
     logger.info(resumen)
-    print(resumen)
+    print(utils.colored_text(resumen, utils.Colors.GREEN))
     
     return total_eliminado, archivos_eliminados
 
@@ -96,12 +113,12 @@ def limpiar_papelera_reciclaje_seguro(confirmar=False, mostrar_progreso=True, so
         items = list(rb)
         if not items:
             logger.info("La papelera de reciclaje ya está vacía.")
-            print("La papelera de reciclaje ya está vacía.")
+            print(utils.colored_text("La papelera de reciclaje ya está vacía.", utils.Colors.YELLOW))
             return True # Considerar éxito si ya está vacía
 
         if modo_informe:
             # Listar contenido y tamaño aproximado si está disponible
-            print("Papelera de reciclaje - MODO INFORME")
+            print(utils.colored_text("Papelera de reciclaje - MODO INFORME", utils.Colors.YELLOW))
             total = 0
             count = 0
             for entry in items:
@@ -126,11 +143,11 @@ def limpiar_papelera_reciclaje_seguro(confirmar=False, mostrar_progreso=True, so
         # No es modo informe: proceder a vaciar
         rb.empty(confirm=confirmar, show_progress=mostrar_progreso, sound=sonido)
         logger.info("La papelera de reciclaje ha sido vaciada con éxito.")
-        print("La papelera de reciclaje ha sido vaciada con éxito.")
+        print(utils.colored_text("La papelera de reciclaje ha sido vaciada con éxito.", utils.Colors.GREEN))
         return True
     except Exception as e:
         logger.error(f"Ocurrió un error al intentar vaciar la papelera de reciclaje: {e}", exc_info=True)
-        print(f"Error al vaciar la papelera de reciclaje: {e}")
+        print(utils.colored_text(f"Error al vaciar la papelera de reciclaje: {e}", utils.Colors.RED))
         return False
 
 def limpiar_winsxs():
@@ -145,16 +162,16 @@ def limpiar_winsxs():
         
         logger.info("Comando DISM ejecutado con éxito.")
         logger.debug(f"Salida DISM: {resultado.stdout}")
-        print("Limpieza de WinSxS completada con éxito.")
+        print(utils.colored_text("Limpieza de WinSxS completada con éxito.", utils.Colors.GREEN))
         return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Error al ejecutar el comando DISM para WinSxS: {e}", exc_info=True)
         logger.error(f"Salida de error DISM: {e.stderr}")
-        print(f"Error al limpiar WinSxS: {e.stderr}")
+        print(utils.colored_text(f"Error al limpiar WinSxS: {e.stderr}", utils.Colors.RED))
         return False
     except Exception as e:
         logger.error(f"Ocurrió un error inesperado al limpiar WinSxS: {e}", exc_info=True)
-        print(f"Error inesperado al limpiar WinSxS: {e}")
+        print(utils.colored_text(f"Error inesperado al limpiar WinSxS: {e}", utils.Colors.RED))
         return False
 
 def limpiar_copias_sombra():
@@ -163,7 +180,7 @@ def limpiar_copias_sombra():
     if not is_admin():
         mensaje_error = "Se requieren privilegios de administrador para eliminar copias de sombra. Por favor, ejecute la aplicación como administrador."
         logger.error(mensaje_error)
-        print(mensaje_error)
+        print(utils.colored_text(mensaje_error, utils.Colors.RED))
         return False
     try:
         comando = ["vssadmin", "delete", "shadows", "/all", "/quiet"]
@@ -175,7 +192,7 @@ def limpiar_copias_sombra():
            "No items found that satisfy the query." in resultado.stdout:
             mensaje_info = "No se encontraron copias de sombra para eliminar. La papelera de reciclaje ya está vacía o no hay puntos de restauración."
             logger.info(mensaje_info)
-            print(mensaje_info)
+            print(utils.colored_text(mensaje_info, utils.Colors.YELLOW))
             return True
 
         # Si el comando falló por otra razón (código de salida distinto de 0)
@@ -184,16 +201,16 @@ def limpiar_copias_sombra():
             logger.error(f"Error al ejecutar el comando vssadmin para copias de sombra. Código de salida: {resultado.returncode}")
             logger.error(f"Salida de error vssadmin (stdout): {resultado.stdout}")
             logger.error(f"Salida de error vssadmin (stderr): {resultado.stderr}")
-            print(f"Error al eliminar copias de sombra. Mensaje de vssadmin: {error_message}")
+            print(utils.colored_text(f"Error al eliminar copias de sombra. Mensaje de vssadmin: {error_message}", utils.Colors.RED))
             return False
 
         logger.info("Comando vssadmin ejecutado con éxito.")
         logger.debug(f"Salida vssadmin: {resultado.stdout}")
-        print("Eliminación de copias de sombra completada con éxito.")
+        print(utils.colored_text("Eliminación de copias de sombra completada con éxito.", utils.Colors.GREEN))
         return True
     except Exception as e:
         logger.error(f"Ocurrió un error inesperado al eliminar copias de sombra: {e}", exc_info=True)
-        print(f"Error inesperado al eliminar copias de sombra: {e}")
+        print(utils.colored_text(f"Error inesperado al eliminar copias de sombra: {e}", utils.Colors.RED))
         return False
 
 def ejecutar_limpiador():
@@ -238,7 +255,7 @@ def ejecutar_limpiador():
                 # limpiar_archivos_temporales sigan observando la salida esperada.
                 resumen = f"Limpieza completada. Total de archivos procesados para eliminación: {num_archivos}. Espacio total recuperado: {total_recuperado / (1024*1024):.2f} MB."
                 logger.info(f"Limpieza de archivos temporales ({tarea['nivel']}) - Recuperado: {total_recuperado / (1024*1024):.2f} MB, Archivos: {num_archivos}")
-                print(resumen)
+                print(utils.colored_text(resumen, utils.Colors.GREEN))
 
             elif 'funcion' in tarea: # Para otras funciones de limpieza
                 if not utils.confirm_operation(f"¿Está seguro de ejecutar \'{tarea['nombre']}\'? (Esta acción es irreversible)"):
@@ -252,5 +269,5 @@ def ejecutar_limpiador():
                     tarea['funcion']()
 
         else:
-            print("Opción no válida. Por favor, intente de nuevo.")
+            print(utils.colored_text("Opción no válida. Por favor, intente de nuevo.", utils.Colors.YELLOW))
             logger.warning(f"Opción de limpieza no válida seleccionada: {opcion}")

@@ -4,7 +4,7 @@ import unittest
 import os
 import json
 from unittest.mock import patch, mock_open, call
-from src import system_optimizer
+from src import system_optimizer, utils
 
 class TestSystemOptimizer(unittest.TestCase):
 
@@ -43,7 +43,7 @@ class TestSystemOptimizer(unittest.TestCase):
             profiles = system_optimizer.load_optimization_profiles('dummy/path/bad.json')
             self.assertEqual(profiles, [])
 
-    @patch('subprocess.run')
+    @patch('src.utils.subprocess.run')
     def test_get_service_status_running_auto(self, mock_run):
         """Prueba obtener el estado de un servicio que está en ejecución y es automático."""
         # Salida simulada de 'sc.exe query <service>' y 'sc.exe qc <service>'
@@ -60,27 +60,27 @@ class TestSystemOptimizer(unittest.TestCase):
         
         # Configuramos el mock para que devuelva las salidas simuladas
         mock_run.side_effect = [
-            unittest.mock.Mock(stdout=mock_query_output, returncode=0),
-            unittest.mock.Mock(stdout=mock_qc_output, returncode=0)
+            unittest.mock.Mock(stdout=mock_qc_output, returncode=0),
+            unittest.mock.Mock(stdout=mock_query_output, returncode=0)
         ]
 
-        status = system_optimizer.get_service_status('TestService')
+        status = utils.get_service_status('TestService')
 
         self.assertIsNotNone(status)
         self.assertEqual(status['state'], 'RUNNING')
         self.assertEqual(status['startup'], 'AUTO_START')
 
-    @patch('subprocess.run')
+    @patch('src.utils.subprocess.run')
     def test_set_service_startup_type_success(self, mock_run):
         """Prueba que se llama al comando correcto para cambiar el tipo de inicio de un servicio."""
         # Configuramos el mock para que simule una ejecución exitosa
         mock_run.return_value = unittest.mock.Mock(returncode=0)
 
-        result = system_optimizer.set_service_startup_type('TestService', 'disabled')
+        result = utils.set_service_startup_type('TestService', 'disabled')
 
         # Verificamos que subprocess.run fue llamado con los argumentos correctos
         expected_command = ['sc.exe', 'config', 'TestService', 'start=', 'disabled']
-        mock_run.assert_called_once_with(expected_command, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        mock_run.assert_called_once_with(expected_command, capture_output=True, text=True, check=True, encoding='utf-8', errors='replace')
         
         # Verificamos que la función devuelve True en caso de éxito
         self.assertTrue(result)
@@ -157,8 +157,8 @@ class TestSystemOptimizer(unittest.TestCase):
         ]
         mock_set_registry_value.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('src.system_optimizer.get_service_status')
-    @patch('src.system_optimizer.set_service_startup_type')
+    @patch('src.utils.get_service_status')
+    @patch('src.utils.set_service_startup_type')
     @patch('src.system_optimizer.config_manager.load_config')
     @patch('src.utils.confirm_operation', return_value=True)
     def test_optimize_services(self, mock_confirm, mock_load_config, mock_set_service, mock_get_status):
@@ -195,27 +195,38 @@ class TestSystemOptimizer(unittest.TestCase):
         mock_set_service.assert_has_calls(set_service_calls, any_order=True)
 
     @patch('subprocess.run')
-    @patch('src.system_optimizer.config_manager.load_config')
     @patch('src.utils.confirm_operation', return_value=True)
-    def test_optimize_power_plan(self, mock_confirm, mock_load_config, mock_run):
+    def test_optimize_power_plan_success(self, mock_confirm, mock_run):
         """
-        Prueba que la función para optimizar el plan de energía carga la configuración
-        y llama al comando powercfg correctamente.
+        Prueba que la función para optimizar el plan de energía encuentra dinámicamente
+        el plan de alto rendimiento y lo activa.
         """
-        # Arrange: Configuración simulada y mock de subprocess.run
-        mock_config = {"high_performance_guid": "TEST-GUID-HIGH-PERFORMANCE"}
-        mock_load_config.return_value = mock_config
-        mock_run.return_value = unittest.mock.Mock(returncode=0) # Simula éxito
+        # Arrange: Salida simulada de `powercfg /list`
+        mock_powercfg_list_output = """
+        GUID de plan de energía: 381b4222-f694-41f0-9685-ff5bb260df2e  (Equilibrado)
+        GUID de plan de energía: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  (Alto rendimiento)
+        GUID de plan de energía: a1841308-3541-4fab-bc81-f71556f20b4a  (Economizador)
+        """
+        
+        # Configura el mock para simular las dos llamadas a subprocess.run
+        mock_run.side_effect = [
+            # Primera llamada: powercfg /list
+            unittest.mock.Mock(returncode=0, stdout=mock_powercfg_list_output),
+            # Segunda llamada: powercfg /setactive
+            unittest.mock.Mock(returncode=0)
+        ]
 
-        # Act: Llama a la función que estamos probando
-        system_optimizer.optimize_power_plan()
+        # Act
+        result = system_optimizer.optimize_power_plan()
 
-        # Assert: Verifica las llamadas a los mocks
-        mock_load_config.assert_called_once_with("power_plan_settings.json")
-        mock_run.assert_called_once_with(
-            ["powercfg", "/setactive", "TEST-GUID-HIGH-PERFORMANCE"],
-            capture_output=True, text=True, encoding='utf-8', errors='replace'
-        )
+        # Assert
+        self.assertTrue(result)
+        
+        expected_calls = [
+            call(["powercfg", "/list"], capture_output=True, text=True, encoding='oem', errors='replace'),
+            call(["powercfg", "/setactive", "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"], capture_output=True, text=True, encoding='oem', errors='replace')
+        ]
+        mock_run.assert_has_calls(expected_calls)
 
     @patch('subprocess.run')
     @patch('src.utils.confirm_operation', return_value=True)
@@ -231,11 +242,11 @@ class TestSystemOptimizer(unittest.TestCase):
 
         # Assert: Verifica que se llamaron los comandos de red esperados
         expected_commands = [
-            call(["ipconfig", "/release"], capture_output=True, text=True, check=True),
-            call(["ipconfig", "/renew"], capture_output=True, text=True, check=True),
-            call(["ipconfig", "/flushdns"], capture_output=True, text=True, check=True),
-            call(["netsh", "winsock", "reset"], capture_output=True, text=True, check=True),
-            call(["netsh", "int", "ip", "reset"], capture_output=True, text=True, check=True)
+            call(["ipconfig", "/release"], capture_output=True, text=True, check=True, encoding='oem', errors='replace'),
+            call(["ipconfig", "/renew"], capture_output=True, text=True, check=True, encoding='oem', errors='replace'),
+            call(["ipconfig", "/flushdns"], capture_output=True, text=True, check=True, encoding='oem', errors='replace'),
+            call(["netsh", "winsock", "reset"], capture_output=True, text=True, check=True, encoding='utf-8', errors='replace'),
+            call(["netsh", "int", "ip", "reset", "reset.log"], capture_output=True, text=True, check=False, encoding='utf-8', errors='replace')
         ]
         mock_run.assert_has_calls(expected_commands, any_order=False)
 
