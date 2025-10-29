@@ -126,25 +126,29 @@ def confirm_operation(prompt):
 
 def show_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=50, fill='█'):
     """
-    Displays a progress bar in the console.
-
-    Args:
-        iteration (int): current iteration.
-        total (int): total iterations.
-        prefix (str): prefix string.
-        suffix (str): suffix string.
-        decimals (int): positive number of decimals in percent complete.
-        length (int): character length of bar.
-        fill (str): bar fill character.
+    Muestra o actualiza una barra de progreso en la consola.
+    Maneja casos de total cero y limpia la línea al completarse.
     """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filled_length = int(length * iteration // float(total))
+    # Determinar el porcentaje y el relleno de la barra
+    if total > 0:
+        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+        filled_length = int(length * iteration // total)
+    else:
+        percent = "100.0"
+        filled_length = length
+
     bar = fill * filled_length + '-' * (length - filled_length)
-    sys.stdout.write(f'\r{prefix} |{bar}| {percent}% {suffix}')
-    sys.stdout.flush()
+
+    # Construir la cadena de la barra de progreso
+    # El espacio al final asegura que se sobrescriban los caracteres de una línea anterior más larga
+    line = f'\r{prefix} |{bar}| {percent}% {suffix} ' 
+    sys.stdout.write(line)
+
+    # Manejar la finalización
     if iteration == total:
-        sys.stdout.write('\n')
-        sys.stdout.flush()
+        sys.stdout.write('\n') # Mover a la siguiente línea al completar
+    
+    sys.stdout.flush()
 
 
 def get_service_status(service_name):

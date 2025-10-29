@@ -86,11 +86,7 @@ def limpiar_archivos_temporales(nivel='basico', modo_informe=False):
                 archivos_procesados_actualmente += 1
                 utils.show_progress_bar(archivos_procesados_actualmente, total_archivos_a_procesar, prefix = 'Progreso de limpieza:', suffix = 'Completado', length = 30)
     
-    # Asegurarse de que la barra de progreso finalice en 100% y con un salto de línea
-    if total_archivos_a_procesar > 0:
-        utils.show_progress_bar(total_archivos_a_procesar, total_archivos_a_procesar, prefix = 'Progreso de limpieza:', suffix = 'Completado', length = 30)
-    else:
-        print("No se encontraron archivos para limpiar.")
+
     
     resumen = f"Limpieza completada. Total de archivos procesados para eliminación: {archivos_eliminados}. Espacio total recuperado: {total_eliminado / (1024*1024):.2f} MB."
     logger.info(resumen)

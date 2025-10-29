@@ -35,9 +35,9 @@ def setup_logging(log_file=None, console_level=logging.INFO, file_level=logging.
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
-    # Console Handler
+    # Console Handler - Only show WARNING and ERROR messages on the console
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(console_level)
+    console_handler.setLevel(logging.WARNING) # Show only important messages
     console_handler.setFormatter(formatter)
     app_logger.addHandler(console_handler)
 

@@ -118,7 +118,7 @@ def run_system_analysis():
 
     for description, func in analysis_steps:
         current_step += 1
-        print(f"\n{description}...")
+        print(f"{description}...")
         utils.show_progress_bar(current_step, total_steps, prefix='Progreso del Análisis:', suffix='Completado', length=30)
         
         if func == get_system_specs:
@@ -132,8 +132,7 @@ def run_system_analysis():
             print(utils.colored_text(f"Error: El análisis de '{description}' falló.", utils.Colors.RED))
             return
 
-    # Asegurarse de que la barra de progreso finalice en 100%
-    utils.show_progress_bar(total_steps, total_steps, prefix='Progreso del Análisis:', suffix='Completado', length=30)
+
     print(utils.colored_text("\nAnálisis del sistema completado con éxito.", utils.Colors.GREEN))
 
     # --- Construir Informe en Markdown (más legible) ---
@@ -254,7 +253,7 @@ def run_system_analysis():
 
         # Mostrar un resumen formateado en la consola para el usuario (más legible)
         try:
-            _utils.show_header("Resumen del Análisis del Sistema")
+            utils.show_header("Resumen del Análisis del Sistema")
             print(f"Sistema: {specs['os_info']['system']} {specs['os_info']['release']} ({specs['os_info']['architecture']})")
             print(f"Hostname: {specs['os_info']['hostname']}")
             print(f"CPU: {specs['cpu_info']['total_usage']} | Núcleos: {specs['cpu_info']['physical_cores']}/{specs['cpu_info']['total_cores']}")

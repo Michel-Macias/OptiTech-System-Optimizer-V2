@@ -21,9 +21,11 @@ def main():
     parser.add_argument('--no-elevate', action='store_true', help='No intentar elevar privilegios (útil para pruebas).')
     args, _ = parser.parse_known_args()
 
-    # Force UTF-8 output in Python (helps avoid mojibake in Windows consoles)
+    # Force UTF-8 output and enable ANSI colors on Windows
     try:
         import os
+        if sys.platform == 'win32':
+            os.system('') # Enables ANSI escape codes in many Windows terminals
         os.environ.setdefault('PYTHONUTF8', '1')
         # Reconfigure stdout/stderr to utf-8 if supported (Python 3.7+)
         import sys
