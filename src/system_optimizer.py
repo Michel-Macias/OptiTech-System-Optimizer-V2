@@ -228,6 +228,7 @@ def optimize_network():
     }
 
     all_successful = True
+    results_summary = [] # Lista para almacenar el resumen de cada comando
     for description, command in commands.items():
         print(f"\n--- Ejecutando: {description} ---")
         logger.info(f"Ejecutando comando de red: {' '.join(command)}")
@@ -249,21 +250,65 @@ def optimize_network():
             )
             if result.returncode != 0:
                 all_successful = False
-                print(utils.colored_text(f"Comando ejecutado con advertencias. Salida:\n{result.stdout}", utils.Colors.YELLOW))
-                logger.warning(f"El comando '{' '.join(command)}' finalizó con código {result.returncode}. Salida:\n{result.stdout}")
+                if is_reset_command: # Manejo especial para netsh int ip reset
+                    critical_messages_console = []
+                    critical_messages_log = []
+                    restart_needed = False
+                    for line in result.stdout.splitlines():
+                        if "Error" in line or "Acceso denegado" in line:
+                            critical_messages_console.append(utils.colored_text(line, utils.Colors.RED))
+                            critical_messages_log.append(line)
+                        elif "Reinicie el equipo" in line:
+                            critical_messages_console.append(utils.colored_text(line, utils.Colors.YELLOW + utils.Colors.BOLD))
+                            critical_messages_log.append(line)
+                            restart_needed = True
+                    
+                    if critical_messages_console:
+                        print(utils.colored_text("Comando ejecutado con advertencias/errores. Detalles:", utils.Colors.YELLOW))
+                        for msg in critical_messages_console:
+                            print(msg)
+                        if not restart_needed:
+                            print(utils.colored_text("Algunas partes no se pudieron restablecer. Revise los logs para más detalles.", utils.Colors.YELLOW))
+                        results_summary.append({'description': description, 'status': 'Advertencia', 'details': '; '.join(critical_messages_log)})
+                    else:
+                        # Si hay un returncode != 0 pero no encontramos mensajes críticos específicos, es una advertencia general.
+                        logger.warning(f"El comando '{' '.join(command)}' finalizó con código {result.returncode}. Revise el log para la salida completa.")
+                        results_summary.append({'description': description, 'status': 'Advertencia', 'details': result.stdout})
+                else:
+                    # Comandos que no son netsh int ip reset
+                    print(utils.colored_text(f"Comando ejecutado con advertencias. Salida:\n{result.stdout}", utils.Colors.YELLOW))
+                    logger.warning(f"El comando '{' '.join(command)}' finalizó con código {result.returncode}. Salida:\n{result.stdout}")
+                    results_summary.append({'description': description, 'status': 'Advertencia', 'details': result.stdout})
             else:
                 logger.info(f"Comando '{' '.join(command)}' ejecutado con éxito. Salida:\n{result.stdout}")
                 print(utils.colored_text("Comando ejecutado con éxito.", utils.Colors.GREEN))
-
+                results_summary.append({'description': description, 'status': 'Éxito'})
         except FileNotFoundError:
             logger.error(f"Error: El comando '{command[0]}' no se encontró.")
             print(utils.colored_text(f"Error: El comando '{command[0]}' no se encontró. No se puede continuar.", utils.Colors.RED))
             all_successful = False
+            results_summary.append({'description': description, 'status': 'Error', 'details': f"Comando '{command[0]}' no encontrado."})
             break
         except subprocess.CalledProcessError as e:
             all_successful = False
             logger.error(f"El comando '{' '.join(command)}' falló. Salida:\n{e.stderr}")
             print(utils.colored_text(f"Error al ejecutar el comando. Detalles: {e.stderr}", utils.Colors.RED))
+            results_summary.append({'description': description, 'status': 'Error', 'details': e.stderr})
+
+    print("\n--- Resumen de Optimización de Red ---")
+    for result in results_summary:
+        status = result['status']
+        description = result['description']
+        details = result.get('details', '')
+
+        if status == 'Éxito':
+            print(utils.colored_text(f"  ✓ {description}: Éxito", utils.Colors.GREEN))
+        elif status == 'Advertencia':
+            print(utils.colored_text(f"  ! {description}: Advertencia - {details}", utils.Colors.YELLOW))
+        elif status == 'Error':
+            print(utils.colored_text(f"  ✗ {description}: Error - {details}", utils.Colors.RED))
 
     if all_successful:
         print(utils.colored_text("\nOptimización de red completada con éxito.", utils.Colors.GREEN))
+    else:
+        print(utils.colored_text("\nOptimización de red completada con advertencias. Algunas acciones no se completaron.", utils.Colors.YELLOW))
