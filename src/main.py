@@ -21,6 +21,16 @@ def main():
     parser.add_argument('--no-elevate', action='store_true', help='No intentar elevar privilegios (útil para pruebas).')
     args, _ = parser.parse_known_args()
 
+
+
+    # 1. Asegurar privilegios de administrador (saltear si --no-elevate)
+    if not args.no_elevate:
+        # Use module invocation to ensure the elevated process runs the module the same way
+        # This prevents launching a separate Python window that can close immediately
+        privileges.elevate(cmd_args=['-m', 'src.main'])
+    # Si el script se reinicia con privilegios, el código anterior a esta línea se ejecuta de nuevo.
+    # Si ya tiene privilegios, o si se reinició, continúa aquí.
+
     # Force UTF-8 output and enable ANSI colors on Windows
     try:
         import os
@@ -37,14 +47,6 @@ def main():
             pass
     except Exception:
         pass
-
-    # 1. Asegurar privilegios de administrador (saltear si --no-elevate)
-    if not args.no_elevate:
-        # Use module invocation to ensure the elevated process runs the module the same way
-        # This prevents launching a separate Python window that can close immediately
-        privileges.elevate(cmd_args=['-m', 'src.main'])
-    # Si el script se reinicia con privilegios, el código anterior a esta línea se ejecuta de nuevo.
-    # Si ya tiene privilegios, o si se reinició, continúa aquí.
 
     # 2. Configurar el sistema de logging
     logger.setup_logging()

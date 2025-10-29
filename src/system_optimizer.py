@@ -251,29 +251,42 @@ def optimize_network():
             if result.returncode != 0:
                 all_successful = False
                 if is_reset_command: # Manejo especial para netsh int ip reset
-                    critical_messages_console = []
-                    critical_messages_log = []
+                    critical_messages_log = [] # Para registrar detalles completos
                     restart_needed = False
+                    successful_resets_count = 0
+
+                    print(utils.colored_text("Comando ejecutado con advertencias/errores. Detalles:", utils.Colors.YELLOW))
                     for line in result.stdout.splitlines():
-                        if "Error" in line or "Acceso denegado" in line:
-                            critical_messages_console.append(utils.colored_text(line, utils.Colors.RED))
-                            critical_messages_log.append(line)
-                        elif "Reinicie el equipo" in line:
-                            critical_messages_console.append(utils.colored_text(line, utils.Colors.YELLOW + utils.Colors.BOLD))
-                            critical_messages_log.append(line)
+                        stripped_line = line.strip()
+                        if not stripped_line: # Ignorar líneas vacías
+                            continue
+                        
+                        if "se restableció correctamente" in stripped_line:
+                            # Solo imprimir si hay texto descriptivo antes de "se restableció correctamente"
+                            if len(stripped_line.replace("se restableció correctamente.", "").strip()) > 0:
+                                print(utils.colored_text(f"  ✓ {stripped_line}", utils.Colors.GREEN))
+                                successful_resets_count += 1
+                            else:
+                                # Ignorar mensajes genéricos "se restableció correctamente." sin descripción específica
+                                pass
+                        elif "Error" in stripped_line or "Acceso denegado" in stripped_line:
+                            print(utils.colored_text(f"  ✗ {stripped_line}", utils.Colors.RED))
+                            critical_messages_log.append(stripped_line)
+                        elif "Reinicie el equipo" in stripped_line:
+                            print(utils.colored_text(f"  ! {stripped_line}", utils.Colors.YELLOW + utils.Colors.BOLD))
+                            critical_messages_log.append(stripped_line)
                             restart_needed = True
-                    
-                    if critical_messages_console:
-                        print(utils.colored_text("Comando ejecutado con advertencias/errores. Detalles:", utils.Colors.YELLOW))
-                        for msg in critical_messages_console:
-                            print(msg)
+                        else:
+                            # Imprimir otras líneas no críticas que no estén vacías o sean mensajes de éxito genéricos
+                            print(stripped_line)
+
+                    if successful_resets_count > 0:
+                        print(utils.colored_text(f"  ({successful_resets_count} elementos restablecidos correctamente)", utils.Colors.GREEN))
+
+                    if critical_messages_log:
                         if not restart_needed:
                             print(utils.colored_text("Algunas partes no se pudieron restablecer. Revise los logs para más detalles.", utils.Colors.YELLOW))
                         results_summary.append({'description': description, 'status': 'Advertencia', 'details': '; '.join(critical_messages_log)})
-                    else:
-                        # Si hay un returncode != 0 pero no encontramos mensajes críticos específicos, es una advertencia general.
-                        logger.warning(f"El comando '{' '.join(command)}' finalizó con código {result.returncode}. Revise el log para la salida completa.")
-                        results_summary.append({'description': description, 'status': 'Advertencia', 'details': result.stdout})
                 else:
                     # Comandos que no son netsh int ip reset
                     print(utils.colored_text(f"Comando ejecutado con advertencias. Salida:\n{result.stdout}", utils.Colors.YELLOW))
