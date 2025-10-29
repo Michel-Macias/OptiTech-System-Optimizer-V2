@@ -12,7 +12,7 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
 
 ## Progreso del Proyecto
 
-*   [x] **Módulo 1: Estructura y Configuración Inicial**: Configuración de la estructura del proyecto, sistema de logging, gestión de configuración y auto-elevación de privilegios (UAC).
+*   [x] **Módulo 1: Estructura y Configuración Inicial**: Configuración de la estructura del proyecto, sistema de logging, gestión de configuración y auto-elevación de privilegios (UAC), y soporte mejorado para colores ANSI en consola.
 *   [x] **Módulo 2: Funciones de Utilidad**: Implementación de helpers para la interfaz de usuario como encabezados, barras de progreso y confirmaciones.
 *   [x] **Módulo 3: Análisis del Sistema**: Implementación de la capacidad de recopilar y guardar informes detallados sobre el SO, hardware, servicios y uso de recursos.
 *   [x] **Módulo 4: Limpieza del Sistema**: Implementación de funciones para limpiar archivos temporales, vaciar la papelera de reciclaje, limpiar WinSxS y eliminar copias de sombra.

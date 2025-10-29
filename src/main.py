@@ -3,6 +3,7 @@
 import sys
 import logging
 import argparse
+import colorama # Importar colorama
 from src import privileges
 from src import logger
 from src import config_manager
@@ -47,6 +48,9 @@ def main():
             pass
     except Exception:
         pass
+
+    # Inicializar Colorama para asegurar colores en todas las consolas
+    colorama.init()
 
     # 2. Configurar el sistema de logging
     logger.setup_logging()

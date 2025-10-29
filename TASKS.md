@@ -3,6 +3,7 @@
 ## 1. Estructura y Configuración Inicial
 - [x] Autoelevación de privilegios
 - [x] Configuración inicial (rutas, directorios, codificación)
+- [x] Integración de Colorama para soporte de colores ANSI
 - [x] Definir rutas base para logs, backups e informes
 - [x] Crear directorios necesarios si no existen
 - [x] Establecer codificación UTF-8
