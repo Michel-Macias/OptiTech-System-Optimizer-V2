@@ -37,7 +37,7 @@
 
 ## 6. Mantenimiento y Backups
 - [x] Implementar Backup-Registry / Restore-Registry
-- [x] Implementar Backup-SystemRestore
+- [x] Mejorar Implementación de Backup-SystemRestore (Verificación de servicio VSS)
 - [x] Implementar Run-SFC
 - [x] Implementar Run-DISM
 - [x] Implementar Run-CHKDSK

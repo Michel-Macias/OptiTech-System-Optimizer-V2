@@ -23,7 +23,7 @@ Para entender qué hace cada función en un lenguaje sencillo, consulta nuestra 
     *   [x] Optimización de Red
 *   [x] **Módulo 6: Mantenimiento y Backups**
     *   [x] Backup y Restauración del Registro
-    *   [x] Creación de Puntos de Restauración del Sistema
+    *   [x] Creación de Puntos de Restauración del Sistema (Mejorada con verificación de servicio VSS)
     *   [x] Ejecución de SFC (System File Checker)
     *   [x] Ejecución de DISM (Deployment Image Servicing and Management)
     *   [x] Ejecución de CHKDSK (Check Disk)
