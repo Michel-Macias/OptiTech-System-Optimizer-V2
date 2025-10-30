@@ -56,13 +56,17 @@ Todas las funcionalidades principales han sido implementadas y el proyecto ha si
 
 ## Empaquetado y Distribución
 
-La aplicación ha sido empaquetada utilizando **PyInstaller** para crear un ejecutable autónomo para Windows 11.
+La aplicación ha sido empaquetada utilizando **PyInstaller** en modo de directorio (`--onedir`) para Windows 11. Esto significa que se genera una carpeta que contiene el ejecutable principal y todas sus dependencias. Esta elección se hizo para **minimizar la probabilidad de falsos positivos** por parte de Windows Defender y otros antivirus, un problema común con los ejecutables de un solo archivo (`--onefile`) de Python.
 
-- **Ubicación del Ejecutable**: Encontrarás la aplicación lista para usar en el siguiente directorio:
+- **Ubicación del Paquete**: Encontrarás la aplicación lista para usar en el siguiente directorio:
   ```
-  /dist/OptiTechSystemOptimizer/OptiTechSystemOptimizer.exe
+  /dist/OptiTechSystemOptimizer/
   ```
-- **Ejecución**: Se recomienda ejecutar el archivo `OptiTechSystemOptimizer.exe` con **privilegios de administrador** para asegurar el funcionamiento completo de todas las características de mantenimiento y optimización.
+  **Importante**: Para su distribución, se recomienda comprimir toda esta carpeta en un archivo `.zip` y distribuirlo. El usuario final deberá descomprimirlo y ejecutar la aplicación desde dentro de la carpeta resultante.
+
+- **Ejecución**: Para iniciar la aplicación, ejecuta el archivo `OptiTechSystemOptimizer.exe` que se encuentra dentro de la carpeta `/dist/OptiTechSystemOptimizer/`. Se recomienda ejecutarlo con **privilegios de administrador** para asegurar el funcionamiento completo de todas las características de mantenimiento y optimización.
+
+- **Consideraciones sobre Antivirus**: Debido a la naturaleza del empaquetado de aplicaciones Python, es posible que algunos antivirus (incluido Windows Defender) generen **falsos positivos**. Si esto ocurre, puedes añadir la carpeta de la aplicación a las exclusiones de tu antivirus.
 
 ## Cómo Contribuir
 
