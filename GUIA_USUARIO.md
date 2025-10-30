@@ -6,9 +6,13 @@
 
 ## Cómo Empezar
 
-1.  **Ejecuta la aplicación**: Busca el archivo `OptiTech-System-Optimizer-V2.exe` y haz doble clic en él.
-2.  **Acepta los permisos de administrador**: La aplicación solicitará permisos de administrador (una ventana de UAC). Esto es **necesario y seguro**, ya que muchas funciones de optimización y limpieza requieren acceso a nivel de sistema. Sin estos permisos, la herramienta no podrá realizar sus tareas más importantes.
-3.  **Navega por el menú**: Una vez abierta, verás un menú principal con varias opciones. Simplemente escribe el número de la opción que deseas y presiona `Enter`.
+Para usar OptiTech System Optimizer, sigue estos pasos:
+
+1.  **Descomprime la aplicación**: La herramienta se distribuye como una carpeta comprimida en un archivo `.zip`. Descomprime este archivo en la ubicación que prefieras.
+2.  **Ejecuta la aplicación**: Dentro de la carpeta descomprimida, busca el archivo `OptiTechSystemOptimizer.exe` y haz doble clic en él.
+3.  **Acepta los permisos de administrador**: La aplicación solicitará permisos de administrador (una ventana de UAC). Esto es **necesario y seguro**, ya que muchas funciones de optimización y limpieza requieren acceso a nivel de sistema. Sin estos permisos, la herramienta no podrá realizar sus tareas más importantes.
+4.  **Consideraciones sobre Antivirus**: Es posible que tu antivirus (incluido Windows Defender) muestre una advertencia o bloquee la aplicación. Esto se debe a la forma en que se empaquetan las aplicaciones de Python y no significa que la herramienta sea maliciosa. Si esto ocurre, puedes añadir la carpeta de la aplicación a las exclusiones de tu antivirus.
+5.  **Navega por el menú**: Una vez abierta, verás un menú principal con varias opciones. Simplemente escribe el número de la opción que deseas y presiona `Enter`.
 
 ---
 
