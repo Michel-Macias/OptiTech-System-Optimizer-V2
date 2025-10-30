@@ -52,7 +52,17 @@ La herramienta incluye las siguientes funcionalidades principales:
 
 ## Estado Actual del Desarrollo
 
-Todas las funcionalidades principales han sido implementadas y verificadas. Se ha completado una revisión de seguridad y el código ha sido reforzado. El proyecto está ahora en la fase final de documentación y listo para el empaquetado y la distribución.
+Todas las funcionalidades principales han sido implementadas y el proyecto ha sido empaquetado en su primera versión ejecutable. La fase actual se centra en las pruebas del ejecutable y en la corrección de los problemas identificados durante las mismas.
+
+## Empaquetado y Distribución
+
+La aplicación ha sido empaquetada utilizando **PyInstaller** para crear un ejecutable autónomo para Windows 11.
+
+- **Ubicación del Ejecutable**: Encontrarás la aplicación lista para usar en el siguiente directorio:
+  ```
+  /dist/OptiTechSystemOptimizer/OptiTechSystemOptimizer.exe
+  ```
+- **Ejecución**: Se recomienda ejecutar el archivo `OptiTechSystemOptimizer.exe` con **privilegios de administrador** para asegurar el funcionamiento completo de todas las características de mantenimiento y optimización.
 
 ## Cómo Contribuir
 
