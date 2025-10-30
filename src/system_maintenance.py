@@ -103,41 +103,58 @@ def restore_registry(backup_path):
         return False
 
 def create_system_restore_point(description):
-    """Crea un punto de restauración del sistema."""
-    logger.info(f"Creando punto de restauración del sistema con descripción: {description}")
+    \"\"\"Crea un punto de restauración del sistema.\"\"\"
+    logger.info(f\"Creando punto de restauración del sistema con descripción: {description}\")
     try:
+        # Verificar el estado del servicio Volume Shadow Copy (VSS)
+        vss_check_command = [
+            \"powershell.exe\",
+            \"-NoProfile\",
+            \"-ExecutionPolicy\",
+            \"Bypass\",
+            \"-Command\",
+            \"Get-Service -Name \'VSS\' | Select-Object -ExpandProperty Status\"
+        ]
+        vss_result = subprocess.run(vss_check_command, capture_output=True, text=True, check=False)
+        
+        if vss_result.returncode != 0 or vss_result.stdout.strip() != \"Running\":
+            error_msg = \"El servicio \'Volume Shadow Copy (VSS)\' no está en ejecución o está deshabilitado. Por favor, habilítelo manualmente para crear puntos de restauración del sistema.\"\
+            logger.error(error_msg)
+            print(utils.colored_text(error_msg, utils.Colors.RED))\
+            return False
+
         command = [
-            "powershell.exe",
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command",
-            f"Checkpoint-Computer -Description '{description}' -RestorePointType 'MODIFY_SETTINGS'"
+            \"powershell.exe\",
+            \"-NoProfile\",
+            \"-ExecutionPolicy\",
+            \"Bypass\",
+            \"-Command\",
+            f\"Checkpoint-Computer -Description \'{description}\' -RestorePointType \'MODIFY_SETTINGS\'\"
         ]
         
-        print(f"Creando punto de restauración del sistema: '{description}'")
+        print(f\"Creando punto de restauración del sistema: \'{description}\'\")
         result = subprocess.run(command, capture_output=True, text=True, check=True)
 
         if result.returncode == 0:
-            logger.info("Punto de restauración del sistema creado con éxito.")
-            print(utils.colored_text("Punto de restauración del sistema creado con éxito.", utils.Colors.GREEN))
+            logger.info(\"Punto de restauración del sistema creado con éxito.\")
+            print(utils.colored_text(\"Punto de restauración del sistema creado con éxito.\", utils.Colors.GREEN))\r
             return True
         else:
-            logger.error(f"Error al crear el punto de restauración. Stderr: {result.stderr}")
-            print(utils.colored_text(f"Error al crear el punto de restauración: {result.stderr}", utils.Colors.RED))
+            logger.error(f\"Error al crear el punto de restauración. Stderr: {result.stderr}\")
+            print(utils.colored_text(f\"Error al crear el punto de restauración: {result.stderr}\", utils.Colors.RED))\r
             return False
 
     except FileNotFoundError:
-        logger.error("El comando 'powershell.exe' no se encontró. Asegúrese de que está en el PATH del sistema.")
-        print(utils.colored_text("Error: El comando 'powershell.exe' no se encontró.", utils.Colors.RED))
+        logger.error(\"El comando \'powershell.exe\' no se encontró. Asegúrese de que está en el PATH del sistema.\")
+        print(utils.colored_text(\"Error: El comando \'powershell.exe\' no se encontró.\", utils.Colors.RED))\r
         return False
     except subprocess.CalledProcessError as e:
-        logger.error(f"El comando de creación de punto de restauración falló. Stderr: {e.stderr}")
-        print(utils.colored_text(f"Error durante la creación del punto de restauración: {e.stderr}", utils.Colors.RED))
+        logger.error(f\"El comando de creación de punto de restauración falló. Stderr: {e.stderr}\")
+        print(utils.colored_text(f\"Error durante la creación del punto de restauración: {e.stderr}\", utils.Colors.RED))\r
         return False
     except Exception as e:
-        logger.error(f"Error inesperado durante la creación del punto de restauración: {e}", exc_info=True)
-        print(utils.colored_text(f"Ocurrió un error inesperado: {e}", utils.Colors.RED))
+        logger.error(f\"Error inesperado durante la creación del punto de restauración: {e}\", exc_info=True)
+        print(utils.colored_text(f\"Ocurrió un error inesperado: {e}\", utils.Colors.RED))\r
         return False
 
 def run_sfc():
